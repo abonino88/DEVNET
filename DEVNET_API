@@ -30,11 +30,15 @@
 	COMMON ARCHITECTURAL STYLES
 	
 		RPC(Remote Procedure Call)
-		
+		Llamada a procedimiento remoto (RPC) es un modelo de solicitud-respuesta que permite a una aplicación (actuando como cliente) 
+		realizar una llamada de procedimiento a otra aplicación (actuando como un servidor). 
+		EL uso mas comun es que el cliente realiza una solicitud sincronica al servidor y se bloquea mientras el servidor
+		procesa la respuesta.
+		Portocolos: XML-RPC / JSON-RPC / NFS / SOAP
 		
 		SOAP(Simple Object Access Protocol)
-		
-		
+		Es un protocolo basado en XML - se utiliza comunmente con el transporte de protocolo de transferencia de Hipertexto
+				
 		REST(REpresentational State Transfer)
 		
 		
@@ -57,20 +61,20 @@
 				URI:  scheme:[//authority][/path][?query]
 						
 						scheme: 	http: conexxion abierta
-											https: conexion segura
+								https: conexion segura
 						authority:	host:port	 (nombre del host o direccion de ip :  puerto de comunicacion)
-						path:			ruta de acceso al recurso
-						query:			es opcional e indical los parametros de la consulta.
+						path:		ruta de acceso al recurso
+						query:		es opcional e indical los parametros de la consulta.
 						
 						Ej: 	https://10.54.1.95:445/api/v1/coSpaces?filter=sala
-								retorna todos los espacio de un CMS en donde el nombre contiene la cadena sala
+							retorna todos los espacio de un CMS en donde el nombre contiene la cadena sala
 		
 		2. HTTP Method (HTTP Verbs)
 				POST				(Create un nuevo objeto o recurso)
 				GET				(Read recupero datos de un recurso del sistema)
 				PUT				(Reemplaza o Actualiza un recurso del sistema)
-				PATCH			(Actulizacion Parcial de un recurso existente)
-				DELETE		(Borra algun recurso del sistema)
+				PATCH				(Actulizacion Parcial de un recurso existente)
+				DELETE				(Borra algun recurso del sistema)
 				
 		3. Header
 				Informacion opcional.
@@ -85,14 +89,6 @@
 		4.Body
 				Continen los datos que el usaurio desea manipular
 				
-	
-	
-	
-	
-	
-	
-	
-	
 	AUTHENTICATION-AUTHORIZATION
 		
 		1. Authentication
@@ -100,8 +96,6 @@
 		2. Authorization
 			proceso por el cual el usuario demuestre que tienen los permisos necesarios para relaizar alguna accion
 		
-	
-			
 		BASIC:
 			Authorization: Basic <username>:<passwrod>
 			la credenciales se transmiten codificados mediante Base64
