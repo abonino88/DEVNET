@@ -1,0 +1,227 @@
+
+	API (Aplication Programming Interface)
+	
+	CASOS DE USOS:
+	
+		1. Automation tasks
+			creacion de scripts que hagan las tareas manuales en forma automatica y mediante programacion
+		2. Data Integration
+			una aplicacion puede comsumir u reaccionar a datos porporciondos por otra aplicacion
+		3. Functionality
+			una aplicacion puede integrar funcionalidad de otra aplicacion
+			
+	TIPOS DE MODELOS
+
+		1. SINCRONICAS
+			 responden una solicitid directamente e inmediatamente
+			 estan dise;adas en ocaciones donde los datos pueden ser accesibles rapidamente o estan alojaas en 
+			 base de datos.El servidor captura los datos y responde rapidamente.
+			 Del lado del cliente la aplicacion debe esperar la respuesta antes de realizar cualquier otra tarea.
+			 por lo cual bloquea su procesamiento a espera de la respuesta.
+			 
+		2. ASINCRONICAS
+			las asincronicas proporsionan una respuesta indicando que ha reciibido la solicitud.
+			el servidor la procesa y dessancadena una devolucion de llamadas con los datos.
+			El cliente puede procesar los mismos una vez recibido los datos.
+			la aplicacion puede realizar otras tareas y no qedar a la espera de la respuesta.
+			Del lado del cliente se puede implementar un agente de escucha o mecanismo de devolcion de llamada.
+			Otros modelos necesitan que el cliente implemente un mecanismo de sondeo para ver el estado de la solicitud.
+	
+	COMMON ARCHITECTURAL STYLES
+	
+		RPC(Remote Procedure Call)
+		
+		
+		SOAP(Simple Object Access Protocol)
+		
+		
+		REST(REpresentational State Transfer)
+		
+		
+		
+		
+		
+	REST WEB SERVICE APIs
+	
+		Comuniacion a travez del Protocolo HTTP
+		1. HTTP requests/response
+		2. HTTP verbs
+		3. HTTP status codes
+		4. HTTP headers/body
+		
+	###############################################################################
+	REST API requests
+	
+		1. URI (Uniform Resource Identifier)
+				Identifica el recurso a manipular.
+				URI:  scheme:[//authority][/path][?query]
+						
+						scheme: 	http: conexxion abierta
+											https: conexion segura
+						authority:	host:port	 (nombre del host o direccion de ip :  puerto de comunicacion)
+						path:			ruta de acceso al recurso
+						query:			es opcional e indical los parametros de la consulta.
+						
+						Ej: 	https://10.54.1.95:445/api/v1/coSpaces?filter=sala
+								retorna todos los espacio de un CMS en donde el nombre contiene la cadena sala
+		
+		2. HTTP Method (HTTP Verbs)
+				POST				(Create un nuevo objeto o recurso)
+				GET				(Read recupero datos de un recurso del sistema)
+				PUT				(Reemplaza o Actualiza un recurso del sistema)
+				PATCH			(Actulizacion Parcial de un recurso existente)
+				DELETE		(Borra algun recurso del sistema)
+				
+		3. Header
+				Informacion opcional.
+				los encabezados tienen el formato <nombre>:<valor>
+				REQUEST HEADERS
+					es informacion adicional qeu no tiene nada qeu ver con el contenido del mensaje
+					Ej: Authorization
+				ENTITY HEADERS
+					es informcion adiional que describe el contenido del mensaje
+					Ej.: Content-Type
+					
+		4.Body
+				Continen los datos que el usaurio desea manipular
+				
+	
+	
+	
+	
+	
+	
+	
+	
+	AUTHENTICATION-AUTHORIZATION
+		
+		1. Authentication
+			verificacion de la identidad del usaurio
+		2. Authorization
+			proceso por el cual el usuario demuestre que tienen los permisos necesarios para relaizar alguna accion
+		
+	
+			
+		BASIC:
+			Authorization: Basic <username>:<passwrod>
+			la credenciales se transmiten codificados mediante Base64
+			Este metodo es miy fragil por lo que se reomienda usar HTTPS, de lo contrario las credecniales
+			aunque esten codificadas no estaran cifradas.
+			
+		BEARER: (token authorization)
+			Authorization: Bearer  <bearer token>
+			debe ser usado con HTTPS
+			tambien conocido como Token Authentication
+			tipicamente usado con OAuth y SSO(Single Sign-On)
+			El Bearer token es un string generado por un servidor de autenticacion por ejemplo un Identity Service(IdS)
+		
+		API Key:
+			conocido tambien como API Token
+			
+			es una cadena alfanumerica generado por un servidro y asignada a un usuario.
+			Generalmente para obtener el key el user debera logeare con sus credenciales en un portal.
+			esta se asigan una vez y no se regenera.
+			solo son seguras unsando HTTPS
+	
+
+
+#EJEMPLOS EN PYTHON
+##################################################################################################	
+			
+#HTTP GET en PYTHON
+import requests
+import json
+url = "http://localhost:8080/v1/books"
+books = requests.get(url)
+#la funcion .json() transforma la respuesta a un dictionary
+#devolucion  Content-Type aplication/json
+print(json.dumps(books.json(), indent=4))
+
+
+#HTTP POST en PYTHON
+import requests
+import json
+url = "http://localhost:8080/v1/books"
+book = {
+	"name" = "titulo de libro",
+	"authors" = ["autor1","autor2"],
+	"date" = 1968,
+	"isbn" = "0-201-03801-3"
+}
+response = requests.POST(url, json=book)
+print(response.status_code)
+
+#HTTP POST CON LIBRERIA urllib
+import urllib
+import json
+url = "http://localhost:8080/v1/books"
+book = {
+	"name" = "titulo de libro",
+	"authors" = ["autor1","autor2"],
+	"date" = 1968,
+	"isbn" = "0-201-03801-3"
+}
+payload = json.dumps(book).encode('utf8')
+requests = urllib.requests.Requist(url, data=payload,headers={'Content-Type' : 'application/json'})
+responde= urllib.requests.urlopen(request)
+print(response.status)
+
+
+#HTTP PUT
+import requests
+import json
+url = "http://localhost:8080/v1/books"
+book = {
+	"name" = "titulo de libro",
+	"authors" = ["autor1","autor2"],
+	"date" = 1968,
+	"isbn" = "0-201-03801-3"
+}
+response = requests.POST(url, json=book)
+book_data = responde.json()
+print("Response after ADDING the book to the library)
+print(json.dumps(book_data, indent=4))
+#modifico un valor
+book_data["authors "] = ['Autor corregido"]
+update_book_url = "http://localhost:8080/v1/books/{}".format(book_data['uuid'])
+reponse = requests.put(update_book_url, json=book_data)
+print("http status code after updating the book: ", response.status_code)
+
+#HTTP DELETE
+import requests
+import json
+url = "http://localhost:8080/v1/books"
+book = {
+	"name" = "titulo de libro",
+	"authors" = ["autor1","autor2"],
+	"date" = 1968,
+	"isbn" = "0-201-03801-3"
+}
+#agrego el libro
+response = requests.POST(url, json=book)
+book_data = responde.json()
+#lo borro
+#en book_data al agregar el libro me devulve el uuid (location)
+delete_book_url =  "http://localhost:8080/v1/books/{}".format(book_data['uuid'])
+response = requests.delete(delete_book_url)
+print("http status code after deleting the book: ", response.status_code)
+
+
+#BASIC AUTHETICATION
+#si se usa autenticacion basica se use tambien HTTPS de lo contrario el user y pass se transmiten en texto no cifrado
+import requests
+from requests.auth import HTTPBasicAuth
+import json
+import sys
+url = "http://localhost:8080/v1/accounts"
+username = 'admin'
+passwrod = 'ahsdlasjldjqwdljhwjqhwldjhqwdljqhwldjqwdhqwdjkqwhdlqjwdhlqwjdhlqwjdqlwdj'
+accouns = requests.get(url,auth=HTTPBasicAuth(username,password))
+try:
+	accounts.raise_for_status()
+except requests.exceptions.HTTPError as e:
+	#este codigo no se ejecuta si el user y pass con correctos
+	print("Error : {}".format(e))
+	sys.exit()
+#este codigo se ejecuta siempre
+print(accounts.status_code)
