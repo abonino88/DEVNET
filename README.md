@@ -12,4 +12,10 @@ SECCION 1:  API
             pyATS
             VIRL (Cisco Virtual Internet Routing Laboratory)
             
- SECCION 3: 
+ SECCION 3: Intrduccion
+            SDLC (Software development life cycle)
+            VCS (Version Control Systems)
+            GIT / GitHub
+            Methods and Functions
+            Testing
+            Data Formats (XML / JSON / YAML)
