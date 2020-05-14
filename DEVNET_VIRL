@@ -1,0 +1,19 @@
+VIRL (Cisco Virtual Internet Routing Laboratory )
+
+Simulacion de RED.
+VIRL una herramienta ideal para el aprendizaje, así como un mecanismo útil para probar configuraciones 
+de red y ajustar la automatización para crearlas y probarlas.
+
+VIRL proporciona una CLI local para la administración del sistema, una interfaz REST para la integración 
+con la automatización y una potente interfaz de usuario que ofrece un entorno gráfico completo para crear 
+y configurar topologías de simulación.}
+
+Puede extraer configuraciones de dispositivos individuales o configuraciones de red simuladas 
+completas, como archivos .virl.
+
+El formato de configuración nativo de VIRL se denomina archivo.virl,  que es un archivo YAML 
+legible por humanos. 
+
+. El archivo .virl  contiene una descripción completa de los routeres IOS, sus configuraciones 
+de interfaz y conexión (además de otra información de configuración), credenciales para acceder a ellos, 
+y otros detalles. Estos archivos se pueden utilizar para iniciar simulaciones a través de la API REST VIRL
