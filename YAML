@@ -33,7 +33,7 @@ A.4	MAPAS:permite definir pares clave:valor
 	---
 	{name : Michael, power_level: 9001}
 
-a.5 ESTRUCTURA MAS COMPLEJA
+A.5 ESTRUCTURA MAS COMPLEJA
 	---
 	person:
 		first_name: Michael
