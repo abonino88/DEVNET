@@ -1,0 +1,74 @@
+YAML
+
+sensible a los espacios en blanco y usa indentacion
+
+A.1 INICIO DEL ARCIVO .yml ##esto generalmente no se usa
+	%YAML: especifica la version de YAML
+	%TAG: Define un TAG. se usan para definir tipos de datos
+
+	la mayoria de los doc YAML inician con (---) ignorando el uso de lo anterior
+
+A.2 Escalares: para cadenas y numeros
+	name : Michael
+	power_level: 9001
+
+A.3 Listas:
+	FORMA 1
+	---
+	ansible_statements:
+	- Easy to learn
+	- Powerful
+	- Extensive module support
+
+	FORMA2
+	---
+	ansible_statements: [Easy to learn,Powerful,Extensive module support]
+
+A.4	MAPAS:permite definir pares clave:valor
+	---
+	name : Michael
+	power_level: 9001
+
+	Similar a lo anterior. forma compacta 
+	---
+	{name : Michael, power_level: 9001}
+
+a.5 ESTRUCTURA MAS COMPLEJA
+	---
+	person:
+		first_name: Michael
+		last_name: Heap
+		skills: (*1)
+			- Ansible
+			- Golang
+			- Python
+			- PHP
+		likes: [dogs, walkong, programming] (*2)
+		favorites: (*3)
+			drink: Pepsi Max
+			color: Red
+		other: (*4)
+			- key: value (*5)
+			  another: valor
+			- key: foo
+			  another: bar (*6)
+
+	*1 Lista
+	*2 Lista compuesta
+	*3 Mapa
+	*4 Mapa de listas
+	*5 Mapa
+	*6 Mapa
+
+A.6 LITERALES:permite definir cadenas largas
+	message: >
+		esto en un mensaje largo
+		y puede tener varias
+		lineas
+
+	si usamos | respetara los saltos de linea definidos en el literal
+	message: |
+		esto en un mensaje largo
+		y puede tener varias
+		lineas
+	
