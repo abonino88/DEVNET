@@ -14,17 +14,17 @@
 
 		1. SINCRONICAS
 			 responden una solicitid directamente e inmediatamente
-			 estan dise;adas en ocaciones donde los datos pueden ser accesibles rapidamente o estan alojaas en 
+			 estan diseñadas en ocaciones donde los datos pueden ser accesibles rapidamente o estan alojados en 
 			 base de datos.El servidor captura los datos y responde rapidamente.
-			 Del lado del cliente la aplicacion debe esperar la respuesta antes de realizar cualquier otra tarea.
+			 Del lado del cliente la aplicacion debe esperar la respuesta antes de realizar cualquier otra tarea,
 			 por lo cual bloquea su procesamiento a espera de la respuesta.
 			 
 		2. ASINCRONICAS
 			las asincronicas proporsionan una respuesta indicando que ha reciibido la solicitud.
-			el servidor la procesa y dessancadena una devolucion de llamadas con los datos.
-			El cliente puede procesar los mismos una vez recibido los datos.
-			la aplicacion puede realizar otras tareas y no qedar a la espera de la respuesta.
-			Del lado del cliente se puede implementar un agente de escucha o mecanismo de devolcion de llamada.
+			el servidor la procesa y desencadena una devolucion de llamadas con los datos.
+			El cliente puede procesar los mismos una vez recibidos.
+			la aplicacion puede realizar otras tareas y no quedar a la espera de la respuesta.
+			Del lado del cliente se puede implementar un agente de escucha o mecanismo de devolucion de llamada.
 			Otros modelos necesitan que el cliente implemente un mecanismo de sondeo para ver el estado de la solicitud.
 	
 	COMMON ARCHITECTURAL STYLES
@@ -34,18 +34,56 @@
 		realizar una llamada de procedimiento a otra aplicación (actuando como un servidor). 
 		EL uso mas comun es que el cliente realiza una solicitud sincronica al servidor y se bloquea mientras el servidor
 		procesa la respuesta.
-		Portocolos: XML-RPC / JSON-RPC / NFS / SOAP
+		Protocolos: XML-RPC / JSON-RPC / NFS / SOAP
 		
-		SOAP(Simple Object Access Protocol)
-		Es un protocolo basado en XML - se utiliza comunmente con el transporte de protocolo de transferencia de Hipertexto
+			SOAP(Simple Object Access Protocol)
+			Es un protocolo basado en XML - se utiliza comunmente con el transporte de protocolo de transferencia de Hipertexto
+			
+			Caracteristicas:
+				Independiente: 	SOAP se diseñó para que todos los tipos de aplicaciones puedan comunicarse entre sí, 
+								sin importar lo diferentes que sean. Las aplicaciones se pueden crear utilizando diferentes 
+								lenguajes de programación, se pueden ejecutar en diferentes sistemas operativos y pueden 
+								ser lo más diferentes posible.
+				Extensible: SOAP en sí se considera una aplicación de XML, por lo que las extensiones se pueden construir 
+							encima de él. Esta extensibilidad significa que puede agregar características como fiabilidad 
+							y seguridad.
+				Neutral: SOAP se puede utilizar sobre cualquier protocolo, incluidos HTTP, SMTP, TCP, UDP o JMS.
 				
+			Elementos del mensaje SOAP:
+				Envelope: es el elmento raiz del documento XML. EL namespace define que el documento ML es un mensjae SOAP
+				Header: contiene informacion especifica de la aplicacion (autorizacion, etc)
+				Body: contine los datos a enviar al detinatario, Deben estar en formato XML y en su propio espacio de nombres
+				Fault: proporciona informacion de error o estado (Opcinal-es un elemento secundaruio del body)
+
+			
 		REST(REpresentational State Transfer)
 		
+			establece 6 restriciones:
+				Client-Server: deben independientes
+				Stateless: 	Las solicitudes del cliente al servidor deben contener toda la información que el servidor 
+							necesita para realizar la solicitud. El servidor no puede contener estados de sesión.
+				Cache: 	Las respuestas del servidor deben indicar si la respuesta se puede almacenar en caché o no. 
+						Si se puede almacenar en caché, el cliente puede usar los datos de la respuesta para 
+						solicitudes posteriores. (Ej, next en paginacion)
+				Uniform interface: deben tener estas caracteristicas
+						identification of resources:	en la solicitud se debe identificar un recurso al que el servidor 
+														tendra acceso
+						manipulation of resource though representations: el cliente recibe una representacion del recurso 
+																		 con todos los datos neceserios para procesarlos (por 
+																		 ejemplo si pide un usuario se le devuelve un DICT con 
+																		 los datos del mismo)
+						Self-descriptive messages: 	cada mensaje debe contener toda la imformacion para que el cliente pueda
+													procesarlo.
+													tipo de portocolo.
+													formato del mensaje
+													operacion solicitada.
+						Hypermedia as the engine of application state: el mensaje debe tener los datos necesarios para que el 
+																		clietne pueda aceeder a datos adicionales.
+				Layered system:	el sistema se compone de diferentes capas jerarquicas
+				Code-of-demand: la imformacion devuelta puede incluir codigo ejecutable.(Ej.: javascript)
+				
 		
-		
-		
-		
-	REST WEB SERVICE APIs
+	REST WEB SERVICE APIs (se adhiere a los 6 principios de la arquitecture REST)
 	
 		Comuniacion a travez del Protocolo HTTP
 		1. HTTP requests/response
@@ -87,7 +125,84 @@
 					Ej.: Content-Type
 					
 		4.Body
-				Continen los datos que el usaurio desea manipular
+				Continen los datos que el usuario desea manipular
+				
+		RESPUESTAS DE LAS API REST.
+		---------------------------
+		
+		son respuestas HTTP
+			HTTP Status
+			-----------
+			API REST utiliza ls codigos de estado HTTP
+			1xx informativo (ej. indica que el servidor recibio la solicitud - no tiene body)
+			2xx Exito (el servidor recibio la solicitud y acepto envia datos en el Bady si corresponde -- en 
+						servicios asincronicos 2xx en una confirmacion de que se recibio la solicitud, pero aun 
+						falta procesrla)
+			3xx redireccion (Las respuestas con un código 3xx significan que el cliente tiene una acción 
+							adicional que realizar para que se complete la solicitud.) 
+			4xx error de cliente  ( indica que la solicitud tiene un error -- sintaxis o entrada invalida)
+			5xx error del servidor (Las respuestas con un código 5xx significan que el servidor no puede 
+									satisfacer la solicitud aunque la solicitud en sí sea válida.) 
+		
+			200:	OK						la solicitud se realizo en forma correcta
+			201:	Created					Se cumplio la solicitud y se creo el recurso solicitado
+			202:	Accepted				la solicitud de acepto para el procesamiento
+			400:	Bad Request				la solicitud no se preceso porque hay una error en el request
+			401:	Unauthorization			la solicitud no tiene credenciales de autenticacion validas
+			403:	Forbidden				La solicitud se entendió, pero ha sido rechazada por el servidor
+			404:	Not Found				no se encontro la ruta del acceso al servidor
+			500:	Internal Server Error	la solicitud no se puede complir debido a un error en el servidor
+			503:	Service Unavailable		la solicitud no se puede complir porque actualmente el servidor
+											no puede manejarla.
+		
+			Headers
+			-------
+			Response Headers: 	No se relicionan con el contenido
+								ej: Set-Cookie  // Cache-Control
+			Entity headers:		informacion adicional que describe el contenido del cuerpo del mensaje
+								ej: Content-Type:application/json
+								
+			Body
+			----
+			Datos que el cliente solicito. el tipo de datos se especifica en el Headers en Content-Type.
+			Si la solicitud no se realizao correctamente el Bady puede proporcionar info adicional sobre el
+			problema o una accion que debe rezlizarse pra que la solicitud se realice correctamente.
+			
+			PAGINATION
+			----------
+			Es posible que algunas API, como una API de búsqueda, necesiten enviar una gran cantidad de datos 
+			en la respuesta. Para reducir el uso del ancho de banda en la red, estas API paginarán los datos 
+			de respuesta.
+			La paginación de respuestas permite dividir los datos en fragmentos. 
+			La mayoría de las API que implementan la paginación permitirán al solicitante especificar cuántos 
+			elementos desea en la respuesta. Dado que hay varios fragmentos, la API también tiene que permitir 
+			que el solicitante especifique qué fragmento desea. 
+			No hay una forma estándar para que una API implemente la paginación, pero la mayoría de las 
+			implementaciones usan el parámetro de consulta para especificar qué página se va a devolver 
+			en la respuesta.
+			
+			Compressed responde data
+			------------------------
+			Cuando el servidor necesita enviar grandes cantidades de datos que no se pueden paginar, los datos 
+			comprimidos es otra forma de reducir el ancho de banda.
+			Esta compresión de datos puede ser solicitada por el cliente a través de la propia solicitud de API. 
+			Para solicitar una compresión de datos, la solicitud debe agregar el campo Accept-Encoding
+			gzip / compress / deflate / br / identity / *
+			Si el servidor no puede proporcionar ninguno de los tipos de compresión solicitados, enviará una 
+			respuesta con un código de estado de 406 -- No aceptable.
+			Si el servidor cumple la compresión, enviará la respuesta de vuelta con los datos comprimidos y 
+			agregará el campo Content-Encoding al encabezado de respuesta. El valor de  Content-Encoding  
+			es el tipo de compresión que se usó, lo que permite al cliente descomprimir los datos 
+			de forma adecuada.}
+			
+			Diagrama de secuencia:
+			UML (Unified Modeling Languaje)
+
+
+			
+			
+				
+				
 				
 	AUTHENTICATION-AUTHORIZATION
 		
