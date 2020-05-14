@@ -197,13 +197,7 @@
 			
 			Diagrama de secuencia:
 			UML (Unified Modeling Languaje)
-
-
-			
-			
-				
-				
-				
+	
 	AUTHENTICATION-AUTHORIZATION
 		
 		1. Authentication
@@ -231,8 +225,45 @@
 			Generalmente para obtener el key el user debera logeare con sus credenciales en un portal.
 			esta se asigan una vez y no se regenera.
 			solo son seguras unsando HTTPS
+			
+			tipos de Claves:
+			
+			Public API key
+			Private API key
 	
+			Una solicitud de API REST puede proporcionar una clave de API de varias maneras diferentes:
+			GET http://localhost:8080/v1/books?API_KEY=YOUR_KEY_HERE
+			
+			headers:
+				Authorization: <API Key>
+			Body data:
+				{
+				API_KEY : <API Key>
+				}
+		Authorization mechanisms
+		------------------------
+		La autorización abierta, también conocida como OAuth, combina la autenticación con la autorización. 
+		OAuth se desarrolló como una solución a los mecanismos de autenticación inseguros. 
+		Con una mayor seguridad en comparación con las otras opciones, normalmente es la forma recomendada 
+		de autenticación/autorización para las API de REST.
+		Hay dos versiones de OAuth, denominadas simplemente OAuth 1.0 y OAuth 2.0. La mayoría de las API REST
+		actuales implementan OAuth 2.0, por lo que nos centraremos en eso. Tenga en cuenta, sin embargo, 
+		que OAuth 2.0 no es compatible con versiones anteriores.
+		Definido en  OAuth 2.0 AuthorizationFramework, el marco de autorización de OAuth 2.0 permite a una 
+		aplicación de terceros obtener acceso limitado a un servicio HTTP, ya sea en nombre de un propietario
+		de recursos orquestando una interacción de aprobación entre el propietario del recurso y el servicio HTTP, 
+		o permitiendo que la aplicación de terceros obtenga acceso en su propio nombre..
+		Esencialmente, OAuth 2.0 permite que las aplicaciones pre-registradas obtengan autorización para realizar 
+		solicitudes de API de REST en nombre de un usuario sin que el usuario necesite compartir sus credenciales 
+		con la propia aplicación. OAuth permite al usuario proporcionar credenciales directamente al servidor 
+		de autorización, normalmente un proveedor de identidad (IdP) y un servicio de identidad (IdS), 
+		para obtener un token de acceso que se puede compartir con la aplicación.
+		Este proceso de obtención del token se denomina flujo. A continuación, la aplicación usa este token en la 
+		API de REST como autenticación de portador. A continuación, el servicio web de la API de REST 
+		comprueba el servidor de autorización para asegurarse de que el token es válido y de que el solicitante 
+		está autorizado para realizar la solicitud.
 
+		
 
 #EJEMPLOS EN PYTHON
 ##################################################################################################	
