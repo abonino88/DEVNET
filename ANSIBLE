@@ -1,0 +1,1308 @@
+	ANSIBLE
+	----------------------------------------------------------------------------------------------------------------
+	Ansible es una herramienta de automatizacion y gestion de la configuracion.
+	1. 	no necesita agentes
+	2. 	requiere que este instalado Python en los sistemas a administrar
+	3. 	uso de modulos para enrquecer su funcionalidad
+
+	REQUISITOS
+	----------------------------------------------------------------------------------------------------------------	
+	1. 	Tener ansible instalado en el sistema de control (no puede ser un sistema windows)
+	2. 	Python en los sistemas a administrar
+		por defecto ansible usa el interprete Python localizado en /usr/bin/python
+		algunas distribuciones de linux solo tienen un interprete Python3 en /usr/bin/python3
+		por lo que es esos sistemas puede aparecer un mensaje de error
+	3. ansible administra sistemas mediante SSH
+
+	INSTALACION
+	----------------------------------------------------------------------------------------------------------------
+	#en este caso se instala python 2
+	$sudo apt-get update
+	$sudo apt-get install -y python-minimal
+
+	$ sudo apt-get update
+	$ sudo apt-get install software-properties-common
+	$ sudo apt-add-repository --yes --update ppa:ansible/ansible
+	$ sudo apt-get install ansible
+
+				Si estamos usando OpenStack, podemos pasar en el proceso de creación de la instancia que actúa 
+				como máquina de control de Ansible el script de instalación de Python y Ansible. 
+				De esta forma, una vez creada la instancia, ya estará preparada para para actuar como máquina de 
+				control Ansible.
+				#!/bin/bash
+
+				echo "Instalando Python"
+				apt-get update
+				apt-get install -y python-minimal
+
+				echo "Instalando Ansible"
+				apt-get install -y software-properties-common
+				apt-add-repository --yes --update ppa:ansible/ansible
+				apt-get install -y ansible
+
+	VERIFICACION DE LOS COMPONENTES INSTALADOS
+	$python --version
+
+	$ansible --version
+
+	CONFIGURACION DE LAS MAQUINAS ADMINISTRADAS
+	----------------------------------------------------------------------------------------------------------------
+	$ sudo apt-get update
+	$ sudo apt-get install -y python-minimal
+
+				Si estamos usando OpenStack, podemos pasar en el proceso de creación de las instancias que actúan 
+				como máquinas administradas por Ansible el script de instalación de Python. De esta forma, una vez creadas 
+				las instancias, ya estarán preparadas para para actuar como máquinas administradas por Ansible.
+
+				#!/bin/bash
+
+				echo "Instalando Python"
+				apt-get update
+				apt-get install -y python-minimal
+	
+
+	COPIA DE CLAVES SSH A MAQUINAS ADMINISTRADAS
+	----------------------------------------------------------------------------------------------------------------
+	La comunicación entre la máquina de control y las administradas es vía SSH. 
+	Por tanto, la máquina de control deberá tener la clave privada y las máquinas administradas la clave pública
+	(examinar el archivo ~/.ssh/authorized_keys de las máquinas administradas para ver las claves públicas autorizadas).
+	Para ello, copiaremos la clave desde la máquina de control hasta las máquinas administradas con ssh-copy-id.
+
+	Por ejemplo:
+
+	ssh-copy-id -i ~/.ssh/id_rsa 20.0.0.27
+	ssh-copy-id -i ~/.ssh/id_rsa 20.0.0.22
+
+	HERRAMIENTAS DE LINEA DE COMANDOS INSTALADAS CON ANSIBLE
+	----------------------------------------------------------------------------------------------------------------
+	
+		ansible: Permite la ejecución directa de comandos sobre un conjunto de hosts.
+
+		ansible-playbook: Ejecuta playbooks sobre un conjunto de hosts.
+
+		ansible-vault: Cifra el contenido de archivos con datos sensibles, como los que contienen contraseñas.
+
+		ansible-galaxy: Instala roles de Ansible Galaxy, una plataforma para el intercambio de roles (recetas) Ansible.
+
+		ansible-console: Consola de ejecución de comandos.
+
+		ansible-config: Gestiona la configuración de Ansible.
+
+		ansible-doc: Muestra documentación sobre los módulos instalados.
+
+		ansible-inventory: Muestra información sobre el inventario de hosts.
+
+		ansible-pull: Descarga playbooks desde un sistema de control de versiones y lo ejecuta en el sistema local.
+	
+	ARCHIVOS DE CONFIGURACION Y DE INVENTARIO
+	----------------------------------------------------------------------------------------------------------------
+	En la instalación de Ansible se crea un archivo de configuración global (/etc/ansible/ansible.cfg)
+	y un archivo de inventario global (/etc/ansible/hosts). 
+	Sin embargo, preferimos usar archivos de configuración y de inventario a nivel de cada proyecto Ansible. 
+	Esto permite usar diferentes configuraciones e inventarios en función del proyecto.
+
+	El archivo de inventario contiene la lista de máquinas a administrar. 
+	Cada máquina aparecerá en una línea y es posible crear grupos de máquinas para lanzar posteriormente scripts 
+	Ansible a grupos de máquinas.
+
+			Ejemplo 1. Ejemplo de archivo de inventario hosts.cfg usando grupos
+			# Inventory hosts.cfg file
+
+			[controller]
+			10.0.0.51
+
+			[network]
+			10.0.0.52
+
+			[compute]
+			10.0.0.53
+			10.0.0.54
+			10.0.0.55
+			10.0.0.56
+
+			[block]
+			10.0.0.51
+
+			[shared]
+			10.0.0.63
+
+			[object]
+			10.0.0.61
+			10.0.0.62
+
+	A modo de ejemplo podemos crear una carpeta de trabajo (p.e. cursostic). 
+	En esa carpeta guardaremos todos nuestros archivos. Comenzaremos guardando el archivo de configuración (ansible.cfg) 
+	y el de inventario (hosts.cfg). En el archivo de inventario colocaremos las máquinas a administrar
+
+			Ejemplo 2. Archivo de configuración local ansible.cfg
+			[defaults]
+
+			inventory      = ./hosts.cfg 
+
+			Usar el archivo de inventario situado en la misma carpeta ./hosts.cfg
+
+			Ejemplo 3. Archivo de inventario hosts.cfg
+			# Archivo hosts.cfg de inventario
+			20.0.1.11
+			20.0.1.4
+
+	Prueba de funcionamiento
+
+		$ ansible all -m ping
+
+		20.0.1.11 | SUCCESS => {
+			"changed": false,
+			"ping": "pong"
+		}
+		20.0.1.4 | SUCCESS => {
+			"changed": false,
+			"ping": "pong"
+		}
+
+	COMANDOS DIRECTOS
+	----------------------------------------------------------------------------------------------------------------
+	Ejemplo 4. Conocer el uso de disco de las máquinas del inventario
+	all hace referencia a todos los sistemas del inventario
+		$ ansible all -a "df -h" 
+
+		20.0.1.11 | CHANGED | rc=0 >>
+		Filesystem      Size  Used Avail Use% Mounted on
+		udev            991M     0  991M   0% /dev
+		tmpfs           201M  3.1M  197M   2% /run
+		/dev/vda1        20G  2.0G   18G  10% /
+		tmpfs          1001M     0 1001M   0% /dev/shm
+		tmpfs           5.0M     0  5.0M   0% /run/lock
+		tmpfs          1001M     0 1001M   0% /sys/fs/cgroup
+		tmpfs           201M     0  201M   0% /run/user/1000
+
+		20.0.1.4 | CHANGED | rc=0 >>
+		Filesystem      Size  Used Avail Use% Mounted on
+		udev            991M     0  991M   0% /dev
+		tmpfs           201M  3.1M  197M   2% /run
+		/dev/vda1        20G  2.0G   18G  10% /
+		tmpfs          1001M     0 1001M   0% /dev/shm
+		tmpfs           5.0M     0  5.0M   0% /run/lock
+		tmpfs          1001M     0 1001M   0% /sys/fs/cgroup
+		tmpfs           201M     0  201M   0% /run/user/1000
+
+	EJECUTANDO COMANDOS COMO ROOT
+	----------------------------------------------------------------------------------------------------------------
+	el argumento --become permite ejecutar commandos como root
+
+	realizar operaciones como root en todos los sistemas administrador
+	$ansible all -a "apt update" --become
+
+	Reiniciar todos los sistemas
+	$ansible all -a "reboot" --become
+
+	realizar operaciones a un grupo de sistemas administrados
+	$ansible webserver -a "apt install apache2" --become
+	#webserver es un grupo de servidores
+	#se puede especificar varios grupos separdos por comas
+
+	Copiar un archivo a las maquinas administradas
+	$ansible all -m copy -a "src=sample.txt dest=/home/ubuntu/sample.txt"
+
+
+	PLAYBOOKS PARA OPERACIONES SENCILLAS
+	----------------------------------------------------------------------------------------------------------------
+	estructura:
+		Nombre del Playbook
+		Indicar si queremos recuperar información de los hosts administrados
+		Hosts sobre los que aplicar el playbook
+		Lista de tareas a realizar
+
+		Ejemlo local.yml
+
+		---
+
+		- name: Basic playbook run locally  (*1)
+		  gather_facts: true (*2) 
+		  hosts: localhost (*3)
+		  tasks: (*4)
+				- name: Doing a ping
+				  ping:
+
+				- name: Show info
+				  debug:
+					msg: "Machine name: {{ ansible_hostname }}"
+		
+	*1 Nombre del playbook
+	*2 obtener informacion de los host destino. NO seria necesario poruqe es la ocpion por defecto
+	*3 hosts sobre lso que se aploca la tarea
+	*4 lista de tareas a ejecutar
+	
+	$ansible-playbook local.yml
+
+	PARAMETROS DEL PLAYBOOKS
+	----------------------------------------------------------------------------------------------------------------
+		-i archivo_de_inventario: Permite usar un archivo de inventario específico
+
+		--start-at-task=tarea_de_inicio: Indica la tarea por la que comenzar a ejecutar el playbook
+
+		--step: Permite ejecutar el playbook paso a paso
+
+		--become: Ejecuta operaciones como root
+
+	El comando siguiente ejecuta paso a paso el playbook mysql.yml como root comenzando por la tarea 
+	Update package cache
+
+	$ ansible-playbook mysql.yml --become --start-at-task "Update package cache" --step
+
+	MODIFICAICION DE ARCHIVOS CON blckinfile
+	----------------------------------------------------------------------------------------------------------------
+
+	El módulo blockinfile inserta, actualiza o elimina un bloque de líneas en un archivo. 
+	El texto modificado queda delemitado por líneas que actúan como marcador.
+
+		#Ejemplo blckinfile.yml
+		---
+
+		- name: Blockinfile to edit files
+		  gather_facts: false
+		  hosts: all
+		  tasks:
+			- name: "Adding Ansible manager and managed nodes to /etc/hosts"
+			  blockinfile:
+				name: /etc/hosts  (*1)
+				block: | (*2)
+					# Manager
+					20.0.1.7 manager
+
+					# Managed-1
+					20.0.1.11 managed-1
+
+					# Managed-2
+					20.0.1.4 managed-2
+				marker: "# {mark} ANSIBLE MANAGED BLOCK manager and managed nodes" (*3)
+
+
+		*1 Archivo a modificar
+		*2 Bloque de texto a incluir
+		*3 Texto para delimitar el bloque de texto añadido
+
+		ejecucion
+		$ansible-playbook blockinfile.yml --become
+
+		A continuación se muestra un extracto del archivo /etc/hosts en las máquinas administradas como resultado 
+		de ejecutar el playbook anterior.
+
+		127.0.0.1 localhost
+
+		....
+
+		# BEGIN ANSIBLE MANAGED BLOCK manager and managed nodes (*1) 
+		# Manager (*2)
+		20.0.1.7 manager
+
+		# Managed-1
+		20.0.1.11 managed-1
+
+		# Managed-2
+		20.0.1.4 managed-2
+		# END ANSIBLE MANAGED BLOCK manager and managed nodes (*3) 
+
+		*1 Inicio del texto delimitador del bloque
+		*2 Texto introducido
+		*3 Fin del texto delimitador del bloque
+		
+	USO DE UN ARCHIVO DE VARIABLES PARA LOS Playbook
+	----------------------------------------------------------------------------------------------------------------
+	archivo group_vars/all.yml
+	
+		manager: { name: manager, ip: 20.0.1.7 }
+		managed_1: { name: managed-1, ip: 20.0.1.11 }
+		managed_2: { name: managed-2, ip: 20.0.1.4 }
+		
+		---
+
+		- name: Blockinfile to edit files
+		  gather_facts: false
+		  hosts: all
+		  tasks:
+			- name: "Adding Ansible manager and managed nodes to /etc/hosts"
+			  blockinfile:
+				name: /etc/hosts
+				block: |
+					# Manager
+					{{ manager.ip }} {{ manager.name }} (*1)
+
+					# Managed-1
+					{{ managed_1.ip }} {{ managed_1.name }} (*3) 
+
+					# Managed-2
+					{{ managed_2.ip }} {{ managed_2.name }} (*4)
+			  marker: "# {mark} ANSIBLE MANAGED BLOCK manager and managed nodes"
+	
+	*1 Variables para la IP y nombre del nodo manager
+	*2 Variables para la IP y nombre del nodo managed-1
+	*3 Variables para la IP y nombre del nodo managed-2
+
+	USO DE TEMPLATE PARA CREACION DE ARCHIVOS PERSONALIZADOS
+	----------------------------------------------------------------------------------------------------------------
+	Con template podemos incluir archivos en los nodos administrados sustituyendo previamente las variables 
+	que incluyan por sus valores correspondientes.
+
+		sample-template.txt
+		Ejemplo de archivo personsalizado usando templates:
+
+		El nodo {{ manager.name }} tiene la IP: {{ manager.ip }}.
+		El nodo {{ managed_1.name }} tiene la IP: {{ managed_1.ip }}.
+		El nodo {{ managed_2.name }} tiene la IP: {{ managed_2.ip }}.
+
+		template.yml
+		---
+		
+		- name: Template to customize files
+		  gather_facts : false
+		  hosts: all
+		  tasks:
+			- name: "Creating customized sample-template.txt in /home/ubuntu/sample-template.txt"
+			  template: >
+				src=/home/ubuntu/cursostic/sample-template.txt
+				dest=/home/ubuntu/sample-template.txt
+				owner=ubuntu
+				group=ubuntu
+				mode=0644
+				
+		Ejemplo de archivo personsalizado usando templates:
+
+		El nodo manager tiene la IP: 20.0.1.7.
+		El nodo managed-1 tiene la IP: 20.0.1.11.
+		El nodo managed-2 tiene la IP: 20.0.1.4.
+
+	MODIFICACION DE ARCHIVOS CON lineinfile
+	----------------------------------------------------------------------------------------------------------------
+	El módulo lineinfile asegura que exista una línea con un texto concreto en un archivo. 
+	Para la búsqueda se usan expresiones regulares.
+	
+	Buscar en el archivo /etc/hosts la entrada 172.0.0.1 y agregarle el hostname
+	
+		---
+		
+		- name: lineinfile to edit files
+		  hosts: all
+		  tasks: 
+			- name: "Adding hostname to /etc/hosts"
+			  lineinfile:
+				path: /etc/hosts (*1)
+				insertafter: '^127\.0\.0\.1' (*2)
+				line: 127.0.0.1 {{ ansible_hostname }} (*3)
+	
+		*1 Archivo a modificar
+		*2 Buscar al ultima linea que comienza con 127.0.0.1
+		*3 insertar la linea con 127.0.0.1 y el nombre de la maquina, obtenida en el proceso de
+		   Gathering facts y disponible en la variable ansible_hostname
+	
+	GESTION DE REPOSITORIOS APT
+	----------------------------------------------------------------------------------------------------------------
+	apt_repository permite agregar o eliminar repositorios APT en distribuciones ubuntu y debian
+	
+		apt_repository.yml
+		
+		---
+		
+		- name: apt_repository to manage APT repositories
+		  gather_facts: false
+		  hosts: all
+		  tasks: 
+			- name: "Add APT OpenStack repository for Ububtu Xenial"
+			  apt_repository:
+				repo: "deb http://ubuntu-cloud.archive.canonical.com/ubuntu xenial-updates/ocata main"
+				
+		
+	Para eliminar un repositorio hay qeu usar el parametro state: absent
+		remove-apt_repository.yml
+		
+		---
+		
+		- name: apt_repository to manage APT repositories
+		  gather_facts: false
+		  hosts: all
+		  tasks: 
+			- name: "Add APT OpenStack repository for Ububtu Xenial"
+			  apt_repository:
+				repo: "deb http://ubuntu-cloud.archive.canonical.com/ubuntu xenial-updates/ocata main"
+				state: absent
+				
+	INSTALACION DE PAQUETES
+	----------------------------------------------------------------------------------------------------------------
+	Definiremos una lista de paquetes y lo usaremos como variable
+	
+		apt.yml
+		
+		---
+		
+		- name: Blokinfile to edit files|
+		  gather_facts: false
+		  hosts: all
+		  vars: (*1)
+			packages:
+				- mysql-server
+				- phpmyadmin
+				
+		  tasks: 
+			- name: Install packages old style with explicit list
+			  apt:
+				name: "{{ items }} (*2)
+			  wich_items: (*3)
+				- mysql-server
+				- phpmyadmin
+				
+			- name: Install packages old style using variables
+			  apt:
+				name: "{{ items }}
+			  wich_items:
+			    - "{{ packages }}" (*4)
+				
+			- name: Install packages new style with expicit list
+			  apt:
+				name: ['mysql-server, 'phpmyadmin'] (*5)
+			   
+			- name: Install packages new style using variables
+			  apt:
+				name: "{{ packages }}" (*6)
+			
+		1* Definición de variables en el propio playbook
+		2* {{ item }} representa la variable de iteración de un bucle with_items
+		3* Especificación de un bucle
+		4* Uso de una variable para suministrar los valores sobre los que iterar
+		5* Sintaxis compacta especificando una lista en lugar de usar un bucle
+		6* Sintaxis compacta usando una variable que proporciona los elementos de iteración
+
+		remove-apt.yml
+		
+		---
+		
+		- name: remove apt packages
+		  gather_facts: false
+		  hosts: all
+		  
+		  tasks: 
+			- name: Removing phpmyadminInstall packages old style with explicit list
+			  apt:
+				name: phpmyadmin
+			    state: absent
+				
+	EJECUCION DE COMANDOS EN SISTEMAS REMOTOS
+	----------------------------------------------------------------------------------------------------------------
+		shell.yml
+		
+		---
+		
+		- name: Run commands with shell
+		  hosts: all
+		  
+		  tasks: 
+			- name: Copy sample-template.txt to sample-template.bak
+			  shell: 'cp sample-template.txt sample-template.bak'  (*1)
+			  args: 
+				chdir: /home/ubuntu (*2)
+				
+		*1 Comando a ejecutar
+		*2 Directorio sobre en que ejecutar el comando
+	
+	MANEJO DE ARCHIVOS
+	----------------------------------------------------------------------------------------------------------------
+	El módulo file permite configurar atributos de archivos y directorios. 
+	También permite la creación y eliminación de archivos.
+	
+		file.yml
+		
+		---
+
+		- name: Run file commands
+		  hosts: all
+		  gather_facts: false
+
+		  tasks:
+			- name: Create a directory
+			  file: (*1) 
+				path: /home/ubuntu/myfolder
+				state: directory
+				owner: ubuntu
+				group: ubuntu
+
+			- name: Delete sample-template.bak file
+			  file:
+				path: /home/ubuntu/sample-template.bak
+				state: absent (*2) 
+		
+		1* Creación de un directorio y modificación del propietario
+		2* Eliminar el archivo
+	
+	REINICIAR SERVICIOS
+	----------------------------------------------------------------------------------------------------------------
+	EL modulo service permite la administracion de servicios en nodos remotos
+		
+		service.yml
+		
+		---
+
+		- name: Restart services
+		  hosts: all
+		  gather_facts: false
+
+		  tasks:
+			- name: Restart MySQL and Apache
+			  services: (*1) 
+				name: "{{ item }}" (*1)
+				state: restart
+			  wich_items: (*2)
+				- mysql
+				- apache2
+		
+		1* Elemento del bucle sobre el que se esta iterando
+		2* Lista de servicios sobre los que iterar
+		
+	REINICIAR UNA BATERIA DE SERVICIOS
+	----------------------------------------------------------------------------------------------------------------
+	Podemos usar el módulo shell para lanzar un reboot sobre los nodos adninistrados. 
+	Además, podemos combinar esta operación con el módulo wait_for_connection que espera la cantidad de segundos
+	que le indiquemos. Una vez recuperada la conexión dentro de ese periodo, continúa la ejecución del playbook.
+	
+		reboot-and-wait.yml
+		
+		---
+
+		- name: Reboot and wait
+		  hosts: all
+
+		  tasks:
+			- name: Rebooting
+			  shell: sleep 2 && reboot
+			  async: 1
+			  poll: 0
+
+			- name: Waiting for rebooting
+			  wait_for_connection:
+				delay: 15
+				sleep: 10
+				timeout: 300
+
+			- debug:
+				msg: "{{ inventory_hostname }} is up and running"
+	
+	
+
+	DESCARGA CONDICIONAL DE ARCHIVOS
+	----------------------------------------------------------------------------------------------------------------
+	El módulo fetch permite la descarga de archivos de las máquinas gestionadas al nodo manager.
+	Podemos combinar este módulo con la ejecución condicional que permite por ejemplo descargar el archivo 
+	sólo si la máquina remota tiene cierto nombre. La cláusula when permite la evaluación de expresiones.
+	A modo de ejemplo, usaremos los hechos (facts) recuperados de las máquinas remotas para obtener su nombre 
+	y ejecutar la tarea de descarga de archivos sólo si el nombre coincide con el que buscamos.
+	Otro uso podría ser la instalación de paquetes con yum o apt en función de si la distribución es de la familia 
+	(ansible_facts['os_family']) Red Hat o Debian, respectivamente.
+	
+		conditions.yml
+		
+		---
+
+		- name: Get remote files
+		  hosts: all
+
+		  tasks:
+			- name: Get remote file checking conditions
+			  fetch:
+				src: /etc/hosts
+				dest: /home/ubuntu/hosts-from-managed-1
+				flat: yes (*1) 
+			  when:
+				ansible_facts['hostname'] == "ansible-managed-1" (*2) 
+		
+		1* Descarga el archivo sin añadir el nombre de la máquina y la ruta completa del archivo. 
+		   El comportamiento predeterminado descargaría el archivo en /home/ubuntu/hosts-from-managed-1/20.0.1.11/etc/hosts
+		2* La tarea sólo se ejecuta en aquellos hosts cuyo hostname sea el indicado
+	
+	ORGANIZACION BASICA DE PROYECTOS ANSIBLE
+	----------------------------------------------------------------------------------------------------------------
+	En un modo de funcionamiento normal de Ansible las tareas no suelen estar directamente en los playbooks. En cambio, 
+	se suelen organizar las tareas en roles, y los playbooks incluirán una lista de roles a ejecutar, 
+	junto con los hosts a los que van dirigidos.
+	
+		Ejemplo de playook basado en roles
+		
+		- host: all (*1)
+		  become: true
+		  roles: (*2)
+			- basic
+			
+		- host: controller
+		  become: true
+		  roles:
+			- ntp-server
+			
+		- host: all:!controller (*3)
+		  become: true
+		  roles:
+			- ntp_others
+			
+		- host: all
+		  become: true
+		  roles:
+			- openstack_packages
+			
+		- host: controller
+		  become: true
+		  roles:
+			- sql_database
+			- rabbitmq
+			- memcached
+			
+			
+		1* HOsts sobre los que se ejecutara los roles indicados
+		2* lista de roles a ejecutar
+		3* ejecutar en todos los hosts excepto los controller
+
+	Los roles se definen en carpetas que le dan nombre al rol. 
+	Además, los roles se crean de acuerdo a una estructura de subcarpetas establecida, que es la siguiente:
+
+			tasks: Incluye el archivo main.yml con la lista de tareas a ejecutar. 
+			       La ejecución de una tarea puede desencadenar la ejecución de acciones 
+				   (p.e. reiniciar un servicio tras modificar un archivo de configuración). 
+				   La tarea notifica una acción pendiente. 
+				   Las acciones notificadas se ejecutarán tras finalizar todas las tareas del rol.
+
+			handlers: Incluye el archivo main.yml con la lista de acciones paras las notificaciones pendientes.
+
+			templates: Incluye las plantillas de archivos que se desplegarán en las máquinas remotas previa sustitución 
+			           de variables. Los archivos se colocarán en una estructura de carpetas similar a la que tendrán 
+					   en el host de destino tomando como raíz la carpeta handlers. Por ejemplo, una plantilla para 
+					   personalizar los hosts en las máquinas de destino se colocaría en handlers/etc/hosts,
+					   ya que en las máquinas de destino se coloca en (/etc/hosts).
+					   
+			Ejemplo de organizacion de un rol
+			ntp_server/
+			├── handlers
+			│   └── main.yml
+			├── tasks
+			│   └── main.yml
+			└── templates
+				└── etc
+					└── chrony
+						└── chrony.conf
+				
+			Creacion de la estrctura anterior.
+			$ mkdir -p ntp_server/{handlers,tasks,templates}
+			
+			
+	Un proyecto Ansible se organizaria de la siguiente forma:
+	
+			├── ansible.cfg (*1)
+			├── group_vars (*2)
+			│   └── all.yml
+			├── hosts.cfg (*3)
+			├── playbook-1.yml (*4)
+			├── playbook-2.yml
+			├── ...
+			├── roles (*5)
+			│   ├── barbican
+			│   │   ├── handlers
+			│   │   │   └── main.yml
+			│   │   ├── tasks
+			│   │   │   └── main.yml
+			│   │   └── templates
+			│   │       └── etc
+			│   │           └── barbican
+			│   │               ├── barbican-api-paste.ini
+			│   │               └── barbican.conf
+			│   ├── ...
+			│   ├── heat
+			│   │   ├── handlers
+			│   │   │   └── main.yml
+			│   │   ├── tasks
+			│   │   │   └── main.yml
+			│   │   └── templates
+			│   │       └── etc
+			│   │           └── heat
+			│   │               └── heat.conf
+			│   ├── ...
+			└── site.yml (*6)	
+	
+		1* Archivo de configuración del proyecto (p.e. para indicar el archivo de inventario)
+		2* Variables accesibles a todos los playbooks
+		3* Archivo de inventario de hosts
+		4* Playbooks del proyecto
+		5* Roles del proyecto
+		6* Playbook opcional que contiene la llamada a todos los playbooks del proyecto
+		
+		
+		ejemplo de site.yml
+		- include: playbook-basic.yml
+		- include: playbook-keystone.yml
+		- include: playbook-glance.yml
+		- include: playbook-nova.yml
+		- include: playbook-neutron.yml
+		...
+		
+		tasks/main.yml
+		
+		- name: Install chrony
+		  apt:
+			name: chrony
+			state: latest
+
+		- name: Setup chrony on controller
+		  template: > (*1)
+			src=etc/chrony/chrony.conf
+			dest=/etc/chrony/chrony.conf
+			owner=root
+			group=root
+			mode=0644
+		  notify: restart chrony (*2)
+		  
+		1* Uso de un archivo template
+		2* Notificación de ejecución de una acción al finalizar el rol
+		
+		templates/etc/chrony/chrony/chrony.conf
+		
+		pool 2.debian.pool.ntp.org offline iburst
+
+		server {{ntp_server}} iburst (*1) 
+		allow {{management_network}}/24
+
+		keyfile /etc/chrony/chrony.keys
+		commandkey 1
+		driftfile /var/lib/chrony/chrony.drift
+		log tracking measurements statistics
+		logdir /var/log/chrony
+		maxupdateskew 100.0
+		dumponexit
+		dumpdir /var/lib/chrony
+		logchange 0.5
+		hwclockfile /etc/adjtime
+		rtcsync
+
+		1* Uso de variables. El archivo se creará en los servidores de destino con los valores asignados 
+		   a las variables (p.e. ntp_server: 1.es.pool.ntp.org)
+		   
+		handlers/main.yml
+		
+		- name: restart chrony (*1)
+		  service:
+			name: chrony
+			state: restarted
+			
+		*1 El nombre del handler tiene que corresponder con el indicado en la calusula notify de al tarea
+		
+	CREACION DE UN PLAYBOOKS PARA EL DESPLIEGUE DE UNA APLICACION PHP DESDE UN REPOSITORIO GITHUB
+	----------------------------------------------------------------------------------------------------------------
+
+
+		- name: Clone diariostic repository
+		  git:
+			repo: 'https://github.com/ualmtorres/diariostic.git'
+			dest: /var/www/html/diariostic
+		
+	
+	Veamos un ejemplo de playbook (diariostic.yml) que se ejecutará sobre un equipo al que denominamos 
+	diariostic, que estará incluido en el archivo de inventario de hosts. 
+	El playbook incluye un rol, denominado diariostic.
+	
+		diariostic.yml
+		---
+		
+		- name: Deploy diariostic PHP applivcation from scratch
+          hosts: diariostic
+		  roles:
+		   - disriostic
+		   
+	El rol diariostic descarga Apache, 	PHP y el repositorio de aplicación. 
+	Además, personaliza Apache para que trabaje sobre el puerto 8080 en lugar de sobre el 80.
+
+		diariostic.yml
+		
+		---
+
+		- name: Update package cache
+		  apt:
+			update_cache: yes
+
+		- name: Install Apache and PHP
+		  apt:
+			name: ['apache2', 'php']
+
+		- name: Clone diariostic repository
+		  git:
+			repo: 'https://github.com/ualmtorres/diariostic.git'
+			dest: /var/www/html/diariostic
+
+		- name: Change port to 8080 in /etc/apache2/ports.conf
+		  lineinfile:
+			path: /etc/apache2/ports.conf
+			regexp: '^Listen 80'
+			line: 'Listen 8080'
+
+		- name: Change port to 8080 in /etc/apache2/sites-enabled/000-default.conf
+		  lineinfile:
+			path: /etc/apache2/sites-enabled/000-default.conf
+			regexp: '^<VirtualHost \*:80>'
+			line: '<VirtualHost *:8080>'
+
+		- name: Restart Apache
+		  service:
+			name: apache2
+			state: restarted   	
+			
+	Despues de ejecutar el Pllaybook con:
+	    
+		$ansible-playbook diariostic.yml --become
+		la aplicacion estara disponible en al carpeta diariostci
+		localhost:8080/diariostic/
+		
+	----------------------------------------------------------------------------------------------------------------
+	#######################################################################################################
+	ANSIBLE GALAXY
+	#######################################################################################################
+	----------------------------------------------------------------------------------------------------------------
+		
+		https://galaxy.ansible.com/
+		
+		Los roles son un concepto básico en Ansible. Con objeto de poder reutilizar roles en diferentes playbooks
+		es interesante organizar los roles en carpetas independientes y tener un repositorio para cada uno de ellos.
+		Dada la posibilidad entonces de organizar así los roles se ha organizado una comunidad para la publicación 
+		e intercambio de roles denominada Ansible Galaxy. Cada rol en Ansible Galaxy está enlazado a su código fuente.
+		
+		INSTALACION DE UN ROL E ANSIBLE GALAXY
+		--------------------------------------
+		Es conveniente disponer entonces de una carpeta donde tengamos almacenados todos los roles (p.e. roles). 
+		Después, en un nivel superior tendremos los playbooks y los archivos de inventario correspondientes a 
+		cada proyecto. Pero quizá sería mejor tener todos los playbooks y archivos de inventario en una carpeta 
+		al mismo nivel que los roles. En este caso los playbooks subirían un nivel y luego bajarían por la carpeta 
+		roles para usar los roles correspondientes.
+		
+			.
+			├── playbooks
+			│   ├── nginx-hosts.cfg
+			│   ├── nginx-playbook.yml
+			│   ├── php-hosts.cfg
+			│   ├── php-playbook.yml
+			│   ├── phpwebserver-hosts.cfg
+			│   └── phpwebserver-playbook.yml
+			└── roles
+				├── geerlingguy.git
+				│   ├── ...
+				├── geerlingguy.php
+				│   ├── ...
+				├── ualmtorres.apache
+				│   ├── ...
+				└── ualmtorres.apache2
+					├── ...
+					
+		Sea roles la carpeta donde guardamos todos nuestros roles y sea geerlingguy.php el rol que queremos instalar,
+		disponible en Ansible Galaxy. Para descargar e instalar el rol localmente escribiríamos:
+		
+				$ansible-galaxy install geerlingguy.php -p roles
+		
+		Luego, en nuestra carpeta de playbooks, crearíamos el archivo de inventario de hosts para nuestro 
+		proyecto y el del playbook.
+
+			Ejemplo 33. El archivo php-hosts.cfg
+			20.0.1.11
+			20.0.1.4
+
+			Ejemplo 34. El archivo php-playbook.yml
+			---
+			- hosts: all
+			  become: true
+			  roles:
+				- ../roles/geerlingguy.php
+
+		Para ejecutar este playbook desde la carpeta de playbooks basta con:
+
+			$ ansible-playbook -i nginx-hosts.cfg nginx-playbook.yml
+		
+		CREACION DE UN ROL ANSIBLE GALAXY
+		---------------------------------
+
+		Ansible Galaxy también permite la creación de roles. Esto tiene como ventaja la inicialización de
+		una serie de carpetas y archivos que hará que nuestros roles sigan los estándares establecidos para 
+		el desarrollo en Ansible y seguidos por la comunidad de Ansible.
+		Para crear un rol, sobre la carpeta roles ejecutaremos el comando siguiente para crear un rol 
+		denominado ualmtorres.apache. Seguiremos como regla de nomenclatura un nombre de usuario 
+		(p.e. el nombre de usuario en Ansible Galaxy) seguido de punto (.) y el nombre del rol. 
+		Así, podríamos tener varios roles similares, pero de usuarios diferentes y usar cada uno de ellos 
+		según corresponda.
+		
+			$ansible-galaxy init ualmtorres.apache
+			
+		Esto creara la estructura siguiente:
+		
+			ualmtorres.apache
+			├── defaults (*1)
+			│   └── main.yml
+			├── files (*2)
+			├── handlers (*3)
+			│   └── main.yml
+			├── meta (*4)
+			│   └── main.yml
+			├── README.md (*5)
+			├── tasks (*6)
+			│   └── main.yml
+			├── templates (*7)
+			├── tests (*8)
+			│   ├── inventory
+			│   └── test.yml
+			└── vars (*9)
+				└── main.yml
+		1* Valores por defecto para varables usadas en el rol. Serán sobrescritas por las definidas en vars
+		2* Archivos requeridos para la ejecución del rol. Estos archivos, a diferencia de los situados en 
+		   templates no pueden ser mmanipulados.
+		3* Carpeta de handlers con las tareas pendientes de ejecución generadas por notify en tareas ya 
+		   ejecutadas (p.e. reiniciar servicios tras una modificación de la configuración)
+		4* Metadatos que usar Ansible Galaxy para publicar el rol (p.e. versión mínima de Ansible, 
+		   plataformas soportadas, dependencias, …​)
+		5* Información descriptiva y de uso del rol
+		6* Tareas del rol
+		7* Archivos para procesar en el proceso de despliegue y que se modificarán de acuerdo a las variables que usen
+		8* Casos de prueba para soporte a sistemas de integración continua como Jenkins o Travis
+		9* Variables usadas en el rol. Sobrescriben a las que aparezcan en defaults		
+		
+		Por ejemplo podemos incluir la tarea siguiente en el archivo tasks/main.yml para aegurar que Apache quede
+		instalado.
+		
+			---
+			#Taks file for ualmtorres.apache
+			- name : Install Apache
+			  apt: name=apache2 state=present
+		
+		con el tiempo el directorio quedara de la siguiente forma:
+		
+			├── playbooks (*1)
+			│   ├── nginx-hosts.cfg
+			│   ├── nginx-playbook.yml
+			│   ├── php-hosts.cfg
+			│   ├── php-playbook.yml
+			│   ├── phpwebserver-hosts.cfg
+			│   └── phpwebserver-playbook.yml
+			└── roles (*2)
+				├── geerlingguy.git (*3) 
+				│   ├── ...
+				├── geerlingguy.php (*4)
+				│   ├── ...
+				└── ualmtorres.apache (*5)
+					├── ...		
+		
+		1* Carpeta para playbooks y arhivos de inventario
+		2* Carpeta para roles
+		3* Rol de instalación de Git
+		4* Rol de instalación de PHP
+		5* Rol propio de instalación de Apache
+		
+		Si ahora queremos desarrollar un playbook con Apache y PHP que use los roles ualmtorres.apache 
+		y geerlingguy.php, bastaría con crear un nuevo playbook como el siguiente
+		
+		phpwebserver-playbook.yml
+		
+			---
+			- hosts: all
+			  become: true
+			  roles:
+				- ../roles/ualmtorres.apache
+				- ../roles/geerlingguy.php
+				
+		Para ejecutarlo, desde la carpeta de playbooks escribiríamos:
+
+			$ ansible-playbook -i phpwebserver-hosts.cfg phpwebserver-playbook.yml 
+		
+		El archivo phpwebserver-hosts.cfg contendría la lista de hosts en la que se desea ejecutar el playbook		
+		
+	----------------------------------------------------------------------------------------------------------------
+	#######################################################################################################
+	FIN de ANSIBLE GALAXY
+	#######################################################################################################
+	----------------------------------------------------------------------------------------------------------------
+
+	PLAYBOOK PARA INICIALIZAR UNA BASE DE DATOS MYSQL
+	----------------------------------------------------------------------------------------------------------------
+	En este ejemplo veremos cómo inicializar un servidor con MySQL con una base de datos precargada. 
+	El servidor MySQL lo instalaremos con un rol de Ansible Galaxy. 
+	El script de la base de datos lo descargaremos con una tarea Ansible para la descarga de archivos. 
+	La carga la haremos con una tarea Ansible del módulo MySQL para la carga de datos.
+
+	INSTALACION DE MySQL
+	
+		$ansible-galaxy install geerlingguy.mysql -p roles
+	
+	El archivo geerlingguy.mysq/defaults/main.yml contiene variables para la personalización de la instalación 
+	de MySQL. Cambiaremos los valores de las dos variables que establecen la contraseña del usuarios root
+	
+	...
+	mysql_user_password: changeme
+	...
+	mysql_root_password: changeme
+	...
+	
+	Crearemos un playbook (mysql.yml) para la instalación del rol
+	
+		---
+
+		- name: MySQL Playbook
+		  hosts: dbserver
+		  roles:
+			- geerlingguy.mysql
+			
+	ejecutamos el Playbook
+	
+		$ansible-playbook mysql.yml --become
+	
+	Esto instalara MYSQL en el host dbserver.
+	El password del usuario root sera changeme.
+	
+	CREACION DE LA BD
+	----------------------------------------------------------------------------------------------------------------
+
+	La creación de la base de datos la haremos en dos pasos. Primero descargaremos a la máquina administrada 
+	el script que contiene el código de inicialización de la base de datos. 
+	Después, importaremos el script descargado a la base de datos.
+	
+		---
+
+		- name: Download SG.sql
+		  get_url: (*1)
+			url: https://raw.githubusercontent.com/ualmtorres/docker_customer_catalog/master/init.sql
+			dest: /home/ubuntu/SG.sql
+
+		- name: Import SG database
+		  mysql_db: (*2) 
+			name: SG
+			state: import
+			target: /home/ubuntu/SG.sql (*3) 
+
+		1* Descargar el archivo indicado en la ruta especificada en dest
+		2* El módulo mysql_db permite la creación y eliminación de bases de datos, así como operaciones 
+		   de importación y exportación
+		3* Ruta de la máquina remota en la que se encuentra el archivo a importar
+	
+		A continuación, modificaremos el playbook anterior (mysql.yml) para añadir el nuevo rol
+
+		---
+
+		- name: MySQL Playbook
+		  hosts: dbserver
+		  roles:
+			- geerlingguy.mysql
+			- crearbdSG (*1) 
+
+		1* Nuevo rol añadido para la carga de datos
+
+		No es necesario ejecutar el playbook completo desde el principio. Podemos indicar que se comience 
+		a ejecutar a partir de una tarea determinada con el parámetro start-at-task
+
+				$ ansible-playbook mysql.yml --become --start-at-task "Download SG.sql"
+
+	AGREGAR UNA APLICACION PHP A LA BASE DE DATOS SG
+	----------------------------------------------------------------------------------------------------------------
+	A continuacion podríamos crear otro playbook para añadir al host anterior un servidor Apache y un intérprete PHP. 
+	Como ejemplo, podríamos descargar un script PHP que muestra el listado de clientes de la base de datos SG.
+	El script está configurado sólo para una prueba de concepto y usa la cuenta de root y la contraseña en el 
+	mismo código. La base de datos se denomina SG, y se accede a través de la cuenta root y con la 
+	contraseña changeme.
+	
+			---
+
+			- name: Update package cache
+			  apt:
+				update_cache: yes
+
+			- name: Install Apache and PHP
+			  apt:
+				name: ['apache2', 'php', 'libapache2-mod-php', 'php-mysql']
+
+			- name: Restart Apache
+			  service:
+				name: apache2
+				state: restarted
+
+			- name: Download customer_catalog
+			  get_url:
+				url: https://raw.githubusercontent.com/ualmtorres/CustomerCatalog/master/index.php
+				dest: /var/www/html/index.php
+
+
+		
+	#######################################################################################################
+	ANEXO: OBtener informacion de los nodos administrados
+	#######################################################################################################
+	
+	Al lanzar la ejecución de un playbook se ejecuta una tarea que recopila información sobre los hosts
+	sobre los que se lanza el playbook. Entre esta información se encuentra información del procesador,
+	red, fecha y hora, variables de entorno y gran cantidad de información de los sistemas remotos.
+
+	El comando siguiente muestra la información que se recupera de los hosts remotos:
+
+		$ ansible all -m setup
+		
+	Para acceder a la información recopilada usaremos la variable hostvars. El ejemplo siguiente muestra 
+	la recuperación de la dirección IP de una interfaz de red de un equipo remoto.
+
+		hostvars['myserver.com']['ansible_ens3']['ipv4']['address']
+
+	También se puede usar la notación punto (.) para navegar por los distintos elementos:
+
+		hostvars['20.0.1.4'].ansible_ens3.ipv4.address
+		
+	También podemos usar ansible_facts para acceder a información de los hosts remotos.
+
+		---
+		- hosts: all
+		  tasks:
+			- debug: msg="Nombre {{ ansible_facts.nodename }} Procesador {{ ansible_facts.processor }}"	
+			
+	Para desactivar la recopilación de información de los sistemas remotos añadiremos 
+	gather_facts: false al playbook. 
+	Esto hará que la ejecución sea más rápida en aquellos casos en que no necesitemos obtener 
+	información sobre los sistemas remotos.
+
+		---
+		- hosts: all
+		  gather_facts: false (*1) 
+		  vars_prompt:
+			- name: your_name
+			  prompt: "What is your name?"
+		  tasks:
+			- debug: msg="Hello {{your_name}}"
+		
+		1* Desactivación de recopilación de información de hosts remotos
+
+
+	#######################################################################################################
+	ANEXO: Uso de Variables
+	#######################################################################################################
+
+		Las variables en Ansible son gestionadas por el motor de plantillas Jinja2. Jinja2 propociona 
+		sustitución de variables usando la sintaxis de doble llave {{ variable }}.
+		En Ansible se pueden definir variables a varios niveles, cada uno con un nivel de prioridad. 
+		Las variables definidas en variables con mayor nivel de prioridad sobrescriben los valores 
+		definidos en lugares con mayor nivel de prioridad.
+		
+		Niveles de prioridad crecientes de variales en Ansible
+		command line values (eg “-u user”)
+
+			role defaults
+			inventory file or script group vars
+			inventory group_vars/all
+			playbook group_vars/all
+			inventory group_vars/*
+			playbook group_vars/*
+			inventory file or script host vars
+			inventory host_vars/*
+			playbook host_vars/*
+			host facts / cached set_facts
+			play vars
+			play vars_prompt
+			play vars_files
+			role vars (defined in role/vars/main.yml)
+			block vars (only for tasks in block)
+			task vars (only for the task)
+			include_vars
+			set_facts / registered vars
+			role (and include_role) params
+			include params
+			extra vars (always win precedence)
+			
+		En group_vars/all.yml estableceremos las variables que queremos que sean comunes a todos los playbooks.
+		
+		nodes_by_name:
+			controller: {name: testcontroller, type: controller, management_ip: 10.0.0.51, tunnel_ip: 10.0.1.51, provider_ip: 192.168.64.18}
+			network: {name: testnetwork, type: network, management_ip: 10.0.0.52, tunnel_ip: 10.0.1.52, provider_ip: 192.168.64.19}
+			compute01: {name: testcompute01, type: compute, management_ip: 10.0.0.53, tunnel_ip: 10.0.1.53}
+			compute02: {name: testcompute02, type: compute, management_ip: 10.0.0.54, tunnel_ip: 10.0.1.54}
+			compute03: {name: testcompute03, type: compute, management_ip: 10.0.0.55, tunnel_ip: 10.0.1.55}
+			compute04: {name: testcompute04, type: compute, management_ip: 10.0.0.56, tunnel_ip: 10.0.1.56}
+			block: {name: testcontroller, type: block, management_ip: 10.0.0.51, tunnel_ip: 10.0.1.51}
+			object01: {name: testobject01, type: object, management_ip: 10.0.0.61, tunnel_ip: 10.0.1.61}
+			object02: {name: testobject02, type: object, management_ip: 10.0.0.62, tunnel_ip: 10.0.1.62}
+			shared: {name: testshared, type: shared, management_ip: 10.0.0.63, tunnel_ip: 10.0.1.63, provider_ip: 10.0.0.63}
+		
+		En las tareas o en las plantillas de archivos podremos acceder a estos valores posteriormente con la notacion 
+		punto (.). Como las variables están definidas en group_vars/all.yml no tendremos que indicar nada para 
+		poder acceder a sus valores.
+
+			{{ nodes_by_name.controller.management_ip }}
+			
+		DEFINICION DE VARIABLES EN ARCHIVOS
+		-----------------------------------
+			variables.yml
+			---
+			username: johndoe
+			fullname: John Doe
+		
+			playbook-variables-en-archivo.yml
+			---
+			- hosts: all
+			  vars_files:
+				- variables.yml
+			  tasks:
+				- debug: msg="Username {{ username }}"
+				- debug: msg="Nombre completo {{ fullname 
+				
+		DEFINICION LOCAL DE VARIABLES
+		-----------------------------
+		
+			---
+			- hosts: all
+			  vars:
+				username: johndoe
+				fullname: John Doe
+			  tasks:
+				- debug: msg="Username {{ username }}
+				- debug: msg="Nombre completo {{ fullname }}
+
+		PASO DE VARIABLES EN LINEA DE COMANDOS
+		--------------------------------------
+		Usaremos el parámetro --extra-vars o -e para pasar la lista de pares variable valor la línea 
+		de comandos. Esta opción sobrescribirá cualquier valor asignado previamente
+		
+		$ ansible-playbook playbook-variables-en-archivo.yml -e 'username=mtorres fullname="Manuel Torres"'
+		
+		De forma predeterminada los valores son pasados como cadenas. Si necesitamos pasar valores 
+		númericos, booleanos, listas u otro tipo, las variables se deben pasar como JSON
+	
+		$  ansible-playbook playbook-variables-en-archivo.yml -e '{"username":"mtorres", "fullname":"Manuel Torres"}'
+		
+		PETICION DE VARIABLES EN AL EJECUCION
+		-------------------------------------
+		
+			---
+			- hosts: all
+			  vars_prompt:
+				- name: your_name
+				  prompt: "What is your name?"
+			  tasks:
+				- debug: msg="Hello {{your_name}}"
+		
+		ITERACION SOBRE VARIABLES
+		-------------------------
+		
+		---
+		- hosts: all
+		  become: true
+		  vars_files:
+			- utilities.yml (*1) 
+		  tasks:
+			- name: Instalar utilidades
+		     apt:
+				name: "{{ utilities }}" (*2)
+				state: present
+
+		1* Archivo que contiene la lista de paquetes a instalar
+		2* Variable con la lista de paquetes a instalar
+		
+	
+	
+	
+	#######################################################################################################
+	ANEXO: Tareas ad-hoc habituales
+	#######################################################################################################
+
+		$ansible all -a "reboot" --become
+
+	#######################################################################################################
+	ANEXO: Administracion de OpenStack
+	#######################################################################################################
+
+
+	ENLACE:
+	https://ualmtorres.github.io/CursoAnsible/tutorial/#trueherramientas-de-l-nea-de-comandos-instaladas-con-ansible
