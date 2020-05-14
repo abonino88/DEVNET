@@ -1,18 +1,52 @@
 YAML
 -------------------------------------------------------------------------------------------------------------
+Sensible a los espacios en blanco y usa indentacion
+Ampliamente usado por ansible.
+Maneja identacion
+#Comentario (No se puede incluir dentro de un literal largo)
 
-sensible a los espacios en blanco y usa indentacion
+minumero: !!str 0.1415  #fuerza que el numero se interprete como una cadena
+						#esquema Failsafe
+
+	---
+	edit-config:
+		a-boolean: true
+		default-operation: merge
+		more-numbers:
+		- 225.0
+		- -1.0735
+		some-integers:
+		- 2
+		- 3
+		- 5
+		- 7
+		- 9
+	test-operation:set
+	...
+	
+	NULL (valor dejado en blanco)
+	
+
+Se pueden poner multiples documentos YAML dentro del mismo archivo, separando cada documento
+con (---)
+
 
 A.1 INICIO DEL ARCIVO .yml ##esto generalmente no se usa
 	%YAML: especifica la version de YAML
 	%TAG: Define un TAG. se usan para definir tipos de datos
 
 	la mayoria de los doc YAML inician con (---) ignorando el uso de lo anterior
+	y terminan con (...)
 
 A.2 Escalares: para cadenas y numeros
 	name : Michael
 	power_level: 9001
-
+	
+	Las cadenas no llevan comillas a menos que la misma contenga algun caracter
+	qeu YAML lo tome como caracter especial. se pueden escapar con una barra diagonla inversa
+	
+	EJ: 'my_complex:key' : "my quoted string value\n"
+	
 A.3 Listas:
 	FORMA 1
 	---
@@ -25,10 +59,14 @@ A.3 Listas:
 	---
 	ansible_statements: [Easy to learn,Powerful,Extensive module support]
 
-A.4	MAPAS:permite definir pares clave:valor
+A.4	MAPAS:permite definir pares clave:valor (equivalente a dict de python)
 	---
 	name : Michael
 	power_level: 9001
+	
+	ej. persona:
+			nombre:Adrian
+			apellido:bonino
 
 	Similar a lo anterior. forma compacta 
 	---
@@ -72,4 +110,12 @@ A.6 LITERALES:permite definir cadenas largas
 		esto en un mensaje largo
 		y puede tener varias
 		lineas
+	
+A.7 Parsing and Serializing
+	-----------------------
+	Parsing: analizar la cadena y comprenderla(interpretar los datos)
+	Serializing: tomar los datos almacenados y comvertirlos en una cadena (XML,YAML o JSON)
+	
+
+	
 	
