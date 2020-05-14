@@ -1,1 +1,150 @@
+	Parsing and Serializing
+	-----------------------
+	Parsing: analizar la cadena y comprenderla(interpretar los datos)
+	Serializing: tomar los datos almacenados y comvertirlos en una cadena (XML,YAML o JSON)
+	
+	#Dict de Python
+	auth = {
+		"user": {
+			"username": "myemail@mydomain.com",
+			"key": "90823ff08409408aebcf4320384"
+			}
+		}
+
+	La Api necesita estos datos en XML.
+	<usuario>
+		<nombre de usuario>myemail@mydomain.com</nombre de usuario>
+		<key>90823ff08409408aebcf4320384</key>
+	</usuario>
+
+	#Necesito una funcion de serializacion
+	import dicttoxml    // serialization library
+	import requests     // http request library
+
+	auth = {            // Python dict, containing authentication info
+		"user": {
+			"username": "myemail@mydomain.com",
+			"key": "90823ff08409408aebcf4320384"
+			  }
+	}
+	get_services_query = "https://myservice.com/status/services"
+	xmlstring = dicttoxml(auth)       // convert dict to XML in string form
+	myresponse = requests.get(get_services_query,auth=xmlstring)  // query service
+
+	#Respuesta... Ahora nesecito parsear estos datos
+	<services>
+		<service>
+			<name>Service A</name>
+			<status>Running</status>
+		</service>
+		<service>
+			<name>Service B</name>
+			<status>Idle</status>
+		</service>
+	</services>
+
+	#untagle pasa de XML a Dict
+	import untangle     // xml parser library
+	myreponse_python = untangle.parse(myresponse)
+	print myreponse_python.services.service[1].name.cdata,myreponse_python.services.service[1].status.cdata
+	
+	EJEMPLOS 
+	#########################################################################################################
+	PARSING (Analisis)
+	------------------
+	
+	########################
+	PARSING XML en Python
+	########################
+	
+	<?xml version="1.0" encoding="UTF-8"?>
+	<rpc message-id="1"
+		xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+		<edit-config>
+			<target>
+				<candidate/>
+			</target>
+			<default-operation>merge</default-operation>
+				<test-option>set</test-option>
+				<config>
+					<int8.1
+						xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0"
+						nc:operation="create"
+						xmlns="http://netconfcentral.org/ns/test">9</int8.1>
+				</config>
+		</edit-config>
+	</rpc>
+	
+	#fromstring en vez de un archivo toma el XML de un string
+	
+	import xml.etree.ElementTree as ET
+	import re
+	#utilizo la funcion parse de ET
+	xml = ET.parse("myfile.xml")
+	#Obtego el elemento raiz
+	root = xml.getroot()
+	#Busco coincidencia de expresiones regulares
+	ns = re.match(r'{.*}', root.tag).group(0)
+	#Busco el TAG edit-config
+	editconf = root.find(f"{ns}edit-config")
+	#Voy buscnado los hijo dentro del arbol
+	defop = editconf.find(f"{ns}default-operation")
+	testop = editconf.find(f"{ns}test-option")
+	print("The default-operation contains: %s" % defop.text)
+	print("The test-option contains: %s" % testop.text)
+
+	OUTPUT:
+	The default-operation contains: merge
+	The test-option contains: set
+
+	########################
+	PARSING JSON en Python
+	########################
+	utilizacion de la libreria json
+	
+	Ej. respuesta de una solicitud de token.
+	{
+		"access_token":"ZDI3MGEyYzQtNmFlNS00NDNhLWFlNzAtZGVjNjE0MGU1OGZmZWNmZDEwN2ItYTU3",
+		"expires_in":1209600,
+		"refresh_token":"MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTEyMzQ1Njc4",
+		"refreshtokenexpires_in":7776000
+	}
+	
+	pip install json
+	pip install PyYAML
+	
+	import json
+	import yaml
+	#levanto un archivo en formato json
+	with open('myfile.json','r') as json_file:
+		#lo paso de DICT
+		ourjson = json.load(json_file)
+	json_file.close()
+	print(ourjson)
+	print(ourjson['expires_in'])
+	print("The access token from JSON is: %s" % ourjson['access_token'])
+	print("---")
+	#lo paso el dict a YAML
+	print(yaml.dump(ourjson))
+	
+	
+	########################
+	PARSING YAML en Python
+	########################
+	
+	pip install json
+	pip install PyYAML
+	
+	import json
+	import yaml
+	yaml_file = open("myfile.yaml","r")
+	#paso el YAML a DICT
+	pythondata = yaml.safe_load(yaml_file)
+	print(pythondata['expires_in'])
+	print("The access token from YAML is: %s" % pythondata['access_token'])
+	print("\n\n")
+	#El DIct lo paso a JSON
+	print(json.dumps(pythondata))
+
+
 
