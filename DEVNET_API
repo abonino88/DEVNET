@@ -365,3 +365,141 @@ except requests.exceptions.HTTPError as e:
 	sys.exit()
 #este codigo se ejecuta siempre
 print(accounts.status_code)
+
+	#########################################################################################################################
+	LIMITES DE VELOCIDAD
+	#########################################################################################################################
+	
+	La limitación de velocidad ayuda a:
+			1. evitar una sobrecarga del servidor de demasiadas solicitudes a la vez
+			2. proporcionar un mejor servicio y tiempo de respuesta a todos los usuarios
+			3. proteger contra un ataque de denegación de servicio (DoS)
+			
+	Algoritmos de limite de velocidad
+	---------------------------------
+	
+	Leaky bucket:	El algoritmo de bucket con fugas coloca todas las solicitudes entrantes en una cola de solicitudes 
+					en el orden en que se recibieron. Las solicitudes entrantes pueden entrar a cualquier velocidad,
+					pero el servidor procesará las solicitudes de la cola a una velocidad fija. 
+					Si la cola de solicitudes está llena, se rechaza la solicitud.
+					Con este algoritmo, el cliente debe estar preparado para respuestas retrasadas o solicitudes rechazadas.
+
+	Token bucket:	El algoritmo de bucket de tokens proporciona a cada usuario un número definido de tokens que pueden 
+					usar dentro de un cierto incremento de tiempo, y esos tokens se acumulan hasta que se usan. 
+					Cuando el cliente realiza una solicitud, el servidor comprueba el bucket para asegurarse 
+					de que contiene al menos un token. Si es así, quita ese token y procesa la solicitud. 
+					Con este algoritmo, el cliente debe calcular cuántos tokens tiene actualmente para evitar las 
+					solicitudes rechazadas. También debe controlar las posibles solicitudes rechazadas mediante 
+					la creación en un mecanismo de reintento para cuando se reabastecen los tokens.
+	Fixed window counter:	El algoritmo de contador de ventana fija es similar al bucket de tokens, excepto por dos 
+							diferencias principales: en primer lugar, utiliza un contador en lugar de una colección de
+							tokens y, en segundo lugar, el contador no se puede acumular. Para este algoritmo, se 
+							asigna un contador a una ventana de tiempo fija para representar cuántas solicitudes se 
+							pueden procesar durante ese período. Cuando el servidor recibe una solicitud, se comprueba 
+							el contador de la ventana de tiempo actual para asegurarse de que no es cero. Cuando se 
+							procesa la solicitud, se deduce el contador. Si se cumple el límite para esa ventana de 
+							tiempo, se rechazarán todas las solicitudes posteriores dentro de esa ventana de tiempo. 
+							Cuando comience la siguiente ventana de tiempo, el contador se establecerá de nuevo en 
+							el recuento predeterminado y las solicitudes se pueden procesar de nuevo.
+							Para volver a nuestro ejemplo anterior de 10 solicitudes por hora, utilizando este algoritmo
+							la 11a solicitud en una hora seguirá siendo rechazada, pero después de 6 horas sin solicitudes, 
+							el cliente todavía sólo puede hacer 10 solicitudes en una sola hora porque esas solicitudes 
+							"no utilizadas" no fueron Acumulado.
+							Con este algoritmo, el cliente debe saber cuándo comienza y termina la ventana de tiempo 
+							para que sepa cuántas solicitudes se pueden realizar dentro de esa duración de tiempo. 
+							Al igual que el algoritmo del bucket de token, el cliente debe crear un mecanismo de 
+							reintento para que pueda volver a intentar las solicitudes cuando se haya iniciado la 
+							siguiente ventana de tiempo.
+	Sliding window counter:	El algoritmo de contador de ventana deslizante permite realizar un número fijo de 
+							solicitudes en un tiempo determinado. Esta duración del tiempo no es una ventana fija y 
+							el contador no se repone cuando la ventana comienza de nuevo. En este algoritmo, el 
+							servidor almacena la marca de tiempo cuando se realiza la solicitud. 
+							Cuando se realiza una nueva solicitud, el servidor cuenta cuántas solicitudes ya se 
+							han realizado desde el principio de la ventana hasta la hora actual para determinar 
+							si la solicitud debe procesarse o rechazarse. Por ejemplo, si la tasa es de cinco 
+							solicitudes por minuto, cuando el servidor recibe una nueva solicitud, comprueba 
+							cuántas solicitudes se han realizado en los últimos 60 segundos. 
+							Si ya se han realizado cinco solicitudes, se rechazará la nueva solicitud.
+						
+	LIIMITE DE VELOCIDAD:
+	--------------------
+	puede aparecer en los encabezados:
+	X-RateLimit-Limit: limite de solicitude por unidad de tiempo
+	X-RateLimit-Remaining: solicitudes restantes en la ventana de limite de velocidad
+	X-RateLimit_Reset:el tiempo en el que se restblecera la ventana de limite de velocidad
+	
+	codigos de respuestas generales:
+	429: Demasiadas solicitudes
+	403: Prohibido
+	
+	############################################################################################################################
+	
+	WEBHOOKS
+	--------
+	
+	Un webhook es una devolución de llamada HTTP, o HTTP POST, a una dirección URL especificada que notifica a la 
+	aplicación cuando se ha producido una actividad o "evento" determinado en uno de los recursos de la plataforma. 
+	Los webhooks permiten a las aplicaciones obtener datos en tiempo real, ya que se desencadenan mediante
+	actividades o eventos concretos.(evitan el mecanismo de sondeo)
+
+	Consumo de un webhook
+	Para recibir una notificación de un proveedor de webhook, la aplicación debe cumplir ciertos requisitos:
+		1. La aplicación debe estar ejecutándose en todo momento para recibir solicitudes HTTP POST.
+		2. La aplicación debe registrar un URI en el proveedor de webhook para que el proveedor sepa dónde enviar 
+		   una notificación cuando se produzcan eventos de destino.
+		 Se puede buscar Webhook tester.
+		 
+	SOLUCIONES A RESPUESTAS DEL SERVIDOR
+	------------------------------------
+		
+		1. NO recibo ninguna respuesta.
+			Verificar URI
+			revisar proxy, firewall o VPN
+		2. Error de certificado
+			CERTIFICATE_VERIFY_FAILES
+			
+			solucion: resp = requests.get(url, verify=False)
+			
+			1xx: Informativo: Solicitud recibida, continuando con el proceso.
+			2xx: Success: La acción fue recibida, entendida y aceptada con éxito.
+			3xx: Redirección: Se deben tomar medidas adicionales para completar la solicitud.
+			4xx: Error decliente: La solicitud contiene una sintaxis incorrecta o no se puede cumplir.
+			5xx: Error delservidor: El servidor no pudo cumplir una solicitud aparentemente válida.
+		
+			1. Comprube codigo de retorno
+			2. Comprube el cuerpo de la respuesta.
+			3. revisar codigo de estado.
+			
+	2xx Exito
+	4xx Error del lado del cliente
+		400 bad requets
+			no se encuentra el recurso
+			puede ser error de sintaxis en el JSON
+		401 no autorizado
+			comprobar credenciales
+		403	prohibido
+			se reconocen las credenciales pero no esta autoirzado para relizar la operacion.
+		404 no encontrado
+			recurso no encontrado
+		405 Metodo no permitido
+			ej utilizo un POST en vez un GET
+		406 No aceptable
+			el recurso no tiene una representacion actual
+			el servidor tiene los datos pero no puede representarlos
+		407 se requiere aytentication de proxy
+		409 no se puede completar debido a un conflicto en el recurso de destino
+		415	tipo de soporte no compatible
+			el clinete envio un cuerpo de soliciutd en un formato que el servidor no entiende
+	5XX error del lado del servidor
+		500	Error interno
+		501 no implementado
+		502 puerta de enlace incorrecta
+		503 servicio no dsiponible
+		504	teimpo de espera de puerta de enlace
+		
+		
+			
+		    
+			
+			
+		
