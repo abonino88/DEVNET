@@ -1,0 +1,37 @@
+JSON
+-------------------------------------------------------------------------------------------------------------
+
+NO existen los comentarios en JSON
+Los espacios en blanco no significan nada.
+
+{
+"edit-config":
+{
+"default-operation": "combinar",
+"test-operation": "set",
+"algunos enteros": [2,3,5,7,9],
+"a-booleano": true,
+"more-numbers": [2.25E+2,-1.0735],
+}
+}
+
+Los tipos de datos básicos JSON incluyen números (escritos como enteros positivos y negativos, como 
+flotantes con decimal, o en notación científica), cadenas, booleanos ('true' y 'false') 
+o valores NULL (valor dejado en blanco).
+
+Los objetos individuales en JSON son pares de Clave:Valor
+Ej. "nombre de Clave": "valor"
+
+JSON MAPS and Lists
+Los objetos también pueden contener varios pares clave/valor, separados por comas, creando estructuras 
+equivalentes a objetos JavaScript complejos o diccionarios de Python. Cada par clave/valor individual 
+no necesita su propio conjunto de corchetes, en este caso, pero todo el objeto sí. 
+"edit-config":
+	{
+	"default-operation": "combinar",
+	"test-operation": "set",
+	"algunos enteros": [2,3,5,7,9],
+	"a-booleano": true,
+	"more-numbers": [2.25E+2,-1.0735],
+	}
+	
