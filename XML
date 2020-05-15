@@ -1,0 +1,79 @@
+XML (Extensible Markup Languaje)
+-------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Instance list -->
+<vms>
+  <vm>
+    <vmid>0101af9811012</vmid>
+    <type>t1.nano</type>
+  </vm>
+  <vm>
+    <vmid>0102bg8908023</vmid>
+    <type>t1.micro</type>
+  </vm>
+</vms>
+
+La primera linea se llama Prologo.
+	indica la version y la codificacion, qeu puede ser UTF-8 o UTF-16
+Los nombres de las etiquetas estan definidas por el usuario.
+Al consumir XML desde una API, el proveedor de la API suele documentar los nombres de etiqueta 
+y sus significados y pueden ser representativos del uso definido en un esquema de espacio de 
+nombres público (namespace schema).
+
+Comentarios:
+	<!-- Este en un comentario -->
+	
+Atributos XMLns
+
+En las etiquetas s epueden incluir atributos para brindar info adicional.
+
+Ej.:
+	<vm vmid="10101001" type="t1.nano" />
+	los valores de los atributos siempre van entre comillas dobles o simples.
+	Puede haber varios atributos pero solo uno puede tener un nombre especifico
+	Si un elemanto no tiene contenido podemos cerrarlo como en el ejemplo anterior.
+	
+Espacio de Nombres.
+-------------------
+se definen en forma publica por su URN (Uniform Resources Names)
+Se define en el DOC XML con xml
+Define como se deben interpretar los TAGS.
+
+Ej.:
+Se especifica un espacio de nombres para afirmar que el contenido se debe interpretar 
+de acuerdo con el standard NETCONF.
+
+<rpc message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <kill-session>
+    <session-id>4</session-id>
+  </kill-session>
+</rpc>
+
+Interpretacion de XML.
+----------------------
+OCMo interpretarlo con un DICT:
+vms [
+{
+"vmid": "0101af9811012",
+"type": "t1.nano"
+},
+{
+"vmid": "0102bg8908023",
+"Type": "t1.micro"
+}
+]
+
+El problema es que XML no tiene forma de indicar deliberadamente que una cierta disposición 
+de etiquetas y datos debe interpretarse como una lista. 
+
+
+
+
+	
+
+	
+
+
+
+
+
