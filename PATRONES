@@ -1,0 +1,52 @@
+Patrones de diseño.
+-------------------------------------------------------------------------------------------------------------------------
+Los patrones de diseño de software son soluciones de mejores prácticas para resolver problemas comunes en el 
+desarrollo de software. Los patrones de diseño son independientes del lenguaje.
+Ej. Django para python (MVC Model-View-Control)
+
+Una definición de interfaz es básicamente una colección de prototipos de función, definiendo nombres y 
+tipos para funciones y parámetros que la lógica de nivel superior podría utilizar para invocar un rango de 
+clases (y que estas clases pueden implementar, para exponer su funcionalidad de maneras genéricas). 
+
+Categorias:
+
+1. Creational: patrones utilizados para la creaicon de objetos
+2. Structural: Patrones que definen formas confiables de usar objetos
+3. Behavioral(comportamiento): patrones que definen como los objetos pueden comuncarse y trabajar juntos
+
+Los patrones expresan princpis basicos cpomo puedde ser encapsulacion, ocultamiento de informacion.
+
+VERRMOS DOS MODELOS
+
+Observer design pattern (Observador)
+------------------------------------
+ej: webhook.
+El patrón de diseño de observador es un diseño de notificación de suscripción que permite a los objetos
+(observadores o suscriptores) recibir eventos cuando hay cambios en un objeto 
+(sujeto o publicador) que están observando.
+
+1. el sujeto debe poder guardar una lista de todos los observadores
+2. el sujeto debe tener metodos para agregar y quitar observadores
+3. todos los observadores deben implementar una devolucion de llamada para invocar cuando el editor envia
+   una notificacion
+
+La ventaja del patrón de diseño del observador es que los observadores pueden obtener datos en tiempo 
+real del sujeto cuando se produce un cambio. Los mecanismos de suscripción siempre proporcionan un mejor 
+rendimiento que otras opciones, como el sondeo.
+
+Model-View-Controller(MVC)
+--------------------------
+Su objetivo es simplificar el desarrollo de aplicaciones que dependen de interfaces gráficas de usuario. 
+MVC abstrae el código y la responsabilidad en tres componentes diferentes: modelo, vista y controlador
+
+1. Modelo:es la estructura de datos y responsable de administrar los datos.(obtiene entradda del controlador)
+2. Vista: es la responsable de la representacion visual
+3. Controller:intermediario entre el modelo y la vista.
+
+1.	El usuario  proporciona la  entrada.
+2.	El controlador acepta la entrada y manipula los datos.
+3.	El controlador envía los datos manipulados al modelo.
+4.	El modelo acepta los datos manipulados, los procesa y envía los datos seleccionados (en las formas más estrictas de MVC, a través del controlador) a la vista.
+5.	La vista acepta los datos seleccionados y los muestra al usuario.
+6.	El usuario ve los datos actualizados como resultado de su entrada.
+
