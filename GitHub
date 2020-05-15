@@ -1,0 +1,126 @@
+GitHub
+--------------------------------------------------------------------------------------------------------
+
+•	revisión de código
+•	Documentación
+•	gestión de proyectos
+•	seguimiento de errores
+•	solicitudes de características
+
+
+Protocolos admitidos: SSH / HTTP
+
+los conflictos se deben resolver antes de que se pueda hacer un merge con las mismas
+
+#configuraciones globales
+#cada usaurio es responsable de sus cambios de codigo.c/instalacion de Git debe establecer el nombre y mail
+git config --global user.name "abonino88"
+git config --global user.mail "adrian.bonino@outlook.com"
+
+#Muestra toda la configuracion global
+git config -l
+
+#crea un nuevo repositorio vacio
+git init 
+#crea un repositorio my_repo local
+git init my_repo
+
+#clonar un repositorio (si no pongo directoiro de destino crea uno con el mismo nombre que el de origen)
+git clone <repo> <Directorio destino>
+
+#obtiene una lista de archivos que tienen diferencias entre el directorio local y la rama primaria
+git status
+
+#agregar files al area de ensayo (staging area)
+#se hace una vez realizados comabio en un archvio del area de trabajo se lo agrega a area de ensayo
+git add fiel1
+git add fiel1 file2 file3
+#agreg todos los archivs modificados al area de ensayo
+git add .
+
+#borrar archivos
+git rm file1
+git rm file1 file2
+
+#quieta los archvos del area de ensayo sin quitarlos del directorio de trabajo
+#si estna en el area de trabajo con cambio no los borra
+git rm --cache file1 file2
+
+
+#combina todos las cambios de contenido en el area de ensayo en una solo canfirmacion y actualiza de repositorio
+#git local 
+git commit
+git commit -m "descripcion del commit" #si no agrego mensaje puede dar error
+
+#actualizacion del directorio remoto
+#lso conflicto deben resolverse antes de hacer el git push
+#los conflictos se dan cunado dos personas editan la misma parte del mismo archivo
+git push
+
+#actualiza el directorio local con el directorio remoto(bajo los archivos actualizados)
+git pull
+
+#obtener una lista de ramas
+git branch
+git branch --list
+
+#merge
+#primero me paro en la rama a mergear.
+git checkout branch1
+git merge branch_source
+#octupus merge (pulpo)
+git merge branch_source1 branch_source2
+
+#rastrear los commit
+git log
+#muestra las diferencias entre dos commit
+git diff 6a6ee56 9369bf9
+
+#creo una rama de la que estoy actualmente
+git branch rama1
+git checkout rama1
+#ahora ya puedo trabajar en esta rama
+#cuando termino me paso a la rama original
+git chechout master
+git merge rama1
+
+git branch branch_Parent branch_name
+#tambine puedo usar branch_name
+git switch 
+git checkout brnach_name
+
+#crea la rama y hace el switch
+git checkout -b branch_parent branch_name
+
+#borra una rama
+git branch -d branch_name
+
+
+#agrego un control remoto llamado origin
+git remote add origin https://github.com/abonion88/DEVNET.git
+#modifico mis archivos
+git push origin master
+
+
+Comparar cambios entre archivos
+-------------------------------
+
+#muestra la diferencia en del archivo con el ultimo commit
+git diff file1
+
+git diff commit_id file1
+
+#Muestras la diferencia de file 1 entre los dos commit
+git diff commit1 commit2 file1 
+
+git diff file1 file2
+
+
+DIFERENCIA ENTRE ARCHIVOS.
+--------------------------
+
++ 			indica que se ha agregado una linea
+- 			indica que se ha borrado una linea
+/dev/null	muestra que se ha agregado o quitado un archivo
+@@			indica que el siguiente bloque es de informacion
+index		muestra los commit comparados
