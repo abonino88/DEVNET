@@ -1,0 +1,17 @@
+SISTEMA DE CONTROL DE VERSIONES.
+--------------------------------------------------------------------------------------------------------------
+
+es una forma de administrar los cambios en un conjunto de archivos con el fin de mantener un historial de esos cambios
+Los sistemas de control de versiones almacenan el conjunto maestro de archivos y el historial de cambios en un repositorio.
+Para realizar un cambio en un archivo, un individuo debe obtener una copia de trabajo del repositorio en su sistema local. 
+La copia de trabajo es la copia personal del individuo de los archivos, donde pueden hacer cambios sin afectar a los demás.
+
+•	Permite la colaboración: Varias personas pueden trabajar en un proyecto (un conjunto de archivos) al mismo tiempo 
+    sin reemplazar los cambios de los demás.
+•	Responsabilidad y visibilidad: Saber quién hizo qué cambios, cuándo lo hicieron y (esperemos) por qué.
+•	Trabajar de forma aislada: Cree nuevas características de forma independiente sin afectar al software existente.
+•	Seguridad: Los archivos se pueden revertir cuando se comete un error.
+•	Trabajar en cualquierlugar: los archivos se almacenan en un repositorio, por lo que cualquier dispositivo puede 
+    tener una copia de trabajo.
+	
+
