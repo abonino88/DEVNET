@@ -1,0 +1,24 @@
+NETCONF
+----------------------------------------------------------------------------------------------------
+Es un protocolo definido IETF RFC6241  para instalar, manipular y eliminar la configuración de los 
+dispositivos de red.
+
+
+
+
+Operaciones de protocolo NETCONF
+get				obtener la config en ejecucion  el estado del dispositivo 
+get-config		recuperar todo o parte de una configuracion especifica
+edit-config		editar una configuracion de dispositivo
+copy-config		crear o reemplazar un almacen de datos dde configuracion completo con otro almacen
+				de datos completo.
+delete-config	eliminar un configuracion en un almacen de datos
+lock			bloquear el almacen de datos de configuracion de un dispositico			
+unlock			liberar el bloqueo de configuracion
+close-session	solicitar la terminacion correcto de una session NETCONF
+kill-session	forzar la terminacion de una sisseion NETCONF
+
+Iniciar una sesion NETCONF.
+NETCONF usa SSH como transporte. El puerto SSH de NETCONF predeterminado es 830
+
+ssh user@hostname -p 830
