@@ -1,0 +1,36 @@
+CURL
+---------------------------------------------------------------------------------------
+Peticion GET:
+curl -i http://localhost/recurso
+# la opcion i indica que se muestren las cabeceras de la respuesta.
+
+#con el parematro -H indicamos las cabeceras
+#Por defecto se realiza una peticion GET
+curl -i -H "Accept: application/json" http://localhost/recurso
+
+#para indicar otra petcion usamos el parametro -X (POST,PUT,DELETE)
+#-d podemos poner parametros de la petcion
+curl -i -H "Accept: application/json" -X POST -d "name=javi&phone=800999800" http://localhost/recurso
+
+curl -i -H "Accept: application/json" -X PUT -d "name=new-name" http://localhost/users/1
+curl -i -H "Accept: application/json" -X DELETE http://localhost/users/1
+
+#Para añadir mas de una cabecera
+curl -i -H "Accept: application/json"  -H "Content-Type: application/json" http://localhost/resource
+
+curl -i -H "Accept: application/xml" -H "Content-Type: application/xml" http://localhost/resource
+
+#una peticion POST con cabeceras y codigo JSON
+curl -i -H "Accept: application/json" 
+        -H "Content-Type: application/json" -X POST 
+        -d '{"title":"xyz","year":"xyz"}' http://localhost/resource
+
+-i		Muestra las cabeceras de la respuesta
+-H		configura las cabeceras da la peticion
+-X		indica el metodo de la peticion, si no se pone en un GET
+-d		añade parametros a la peticion (si hay varios deben estar separados por &)
+
+$ curl --user username:password http://localhost/recurso
+$ curl -u username:password http://localhost/recurso
+
+
