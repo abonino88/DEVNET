@@ -25,12 +25,17 @@ curl -i -H "Accept: application/json"
         -H "Content-Type: application/json" -X POST 
         -d '{"title":"xyz","year":"xyz"}' http://localhost/resource
 
--i		Muestra las cabeceras de la respuesta
--H		configura las cabeceras da la peticion
--X		indica el metodo de la peticion, si no se pone en un GET
--d		añade parametros a la peticion (si hay varios deben estar separados por &)
+-i				Muestra las cabeceras de la respuesta
+-H --header		configura las cabeceras da la peticion
+-X --request	indica el metodo de la peticion, si no se pone en un GET
+-d --data   	añade parametros a la peticion (si hay varios deben estar separados por &)
 
 $ curl --user username:password http://localhost/recurso
 $ curl -u username:password http://localhost/recurso
+
+$ curl http://server/api/clients
+-H "Content-Type: application/json"
+-H "Accept: application/domain.com; version=3"
+-H "Api-Client-Key: 999AAAWWW"
 
 
