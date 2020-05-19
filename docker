@@ -118,5 +118,8 @@ sudo docker exec -it pythontest /bin/sh
 sudo docker stop pythontest
 #removerlo
 sudo docker rmi pythontest
+#forzar el borrado
+sudo docker rmi -f imageName
+
 
 
