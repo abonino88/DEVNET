@@ -1,9 +1,18 @@
-NETCONF
+NETCONF / RESTCONF
 ----------------------------------------------------------------------------------------------------
 Es un protocolo definido IETF RFC6241  para instalar, manipular y eliminar la configuración de los 
 dispositivos de red.
+Los protocolos NETCONF y SNMP se definen para configurar dispositivos de forma remota.
 
-
+NETCONF se diseñó para habilitar:
+•	Múltiples almacenes de datos de configuración (candidato, en ejecución, inicio)
+•	Transacciones a nivel de dispositivo y en toda la red
+•	Pruebas de configuración y validación
+•	Distinción entre datos de configuración y operativos
+•	Recuperación selectiva de datos con filtrado
+•	Transmisión y reproducción de notificaciones de eventos
+•	Llamadas de procedimiento remoto extensible
+•	Intercambio de capacidades integrado
 
 
 Operaciones de protocolo NETCONF
@@ -22,3 +31,68 @@ Iniciar una sesion NETCONF.
 NETCONF usa SSH como transporte. El puerto SSH de NETCONF predeterminado es 830
 
 ssh user@hostname -p 830
+
+ejemplo de get-config
+
+<?xml version="1.0"?>
+   <rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"
+    message-id="101">
+   <get-config>
+       <source>
+           <running/>
+       </source>
+   </get-config>
+
+
+EJEMPLO DE NETCONF con PYTHON
+-------------------------------
+No hay API pr el servidro NETCONF entonces se usan librerias de Python.
+ncclient
+En este ejemplo, también obtendremos solo una parte de la configuración mediante el uso del parámetro 
+<filter>  en la función ncclient.  En este caso, la interfaz GigabitEthernet1  
+es la parte de la configuración que nos gusta recuperar.
+
+EL dispositio es un CISOC IOS XE
+El ejemplo de Python recupera la configuración de la interfaz mediante el módulo ietf-interfaces
+
+#Python ejemplo
+from ncclient import manager
+import xml.dom.minidom
+# Courseware Cisco DevNet Sandbox
+HOST = 'devasc-iosxe-mgmt-1'
+USER = 'developer'
+PASS = 'SF!_Zx623_37'
+PORT = 830
+# filtering interface GigabitEthernet1 only
+netconf_filter = """
+<filter>
+  <interfaces xmlns="urn:ietf:params:xml:ns:yang:ietf-interfaces">
+    <interface>
+       <name>GigabitEthernet1</name>
+    </interface>
+  </interfaces>
+</filter>
+"""
+# device is Cisco CSR
+m = manager.connect(host=HOST, port=PORT, username=USER, password=PASS,hostkey_verify=False, device_params={'name': 'csr'})
+
+reply = m.get_config(source='running', filter = netconf_filter)
+# Pretty print the XML reply
+print(xml.dom.minidom.parseString(reply.xml).toprettyxml())
+m.close_session()
+
+RESTCONF
+----------------------------------------------------------------------------------------------------------------------------
+Al igual que NETCONF, utiliza los modelos de almacén de datos y el comando 'verbos' definidos en el Protocolo de 
+configuración de red (NETCONF), encapsulados en mensajes HTTP. Al igual que con NETCONF, el lenguaje YANG se 
+utiliza para definir la sintaxis de la estructura de comandos, como la semántica de la configuración, el estado 
+y los eventos del almacén de datos de configuración.
+
+RESTCONF utiliza datos estructurados (XML o JSON) y YANG para proporcionar API similares a REST, lo que permite 
+el acceso mediante programación a los dispositivos. Los comandos HTTP GET, POST, PUT, PATCH y DELETE se dirigen 
+a una API RESTCONF para tener acceso a los recursos de datos representados por los modelos de datos YANG. 
+Estas operaciones de edición básicas permiten que un cliente RESTCONF vea y modifique la configuración en ejecución.
+RESTCONF no está diseñado para reemplazar NETCONF, sino para proporcionar una interfaz HTTP que siga los principios 
+de transferencia de estado representacional (REST) y sea compatible con el modelo de almacén de datos DE NETCONF. 
+Un dispositivo de red puede servir tanto a NETCONF como a RESTCONF simultáneamente o puede proporcionar solo uno u otro.
+
