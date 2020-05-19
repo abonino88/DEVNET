@@ -1,0 +1,19 @@
+curl --request POST \
+  --header "Authorization: Bearer ACCESS_TOKEN" \
+  --form "files=@/home/desktop/example.png;type=image/png" \
+  --form "roomId=Y2lzY2....." \
+  --form "text=example attached" \
+  https://webexapis.com/v1/messages
+  
+  
+import requests
+from requests_toolbelt.multipart.encoder import MultipartEncoder
+m = MultipartEncoder({'roomId': 'Y2lzY2.....',
+                      'text': 'example attached',
+                      'files': ('example.png', open('example.png', 'rb'),
+                      'image/png')})
+r = requests.post('https://webexapis.com/v1/messages', data=m,
+                  headers={'Authorization': 'Bearer ACCESS_TOKEN',
+                  'Content-Type': m.content_type})
+print r.text
+
