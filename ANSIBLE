@@ -1,5 +1,21 @@
 	ANSIBLE
 	----------------------------------------------------------------------------------------------------------------
+	
+	EL trabajo se separa el archivos YAML (.yml)
+	Organizacion de proyectos:
+		Se organiza es una estructura de directorios.
+		EL modulo de control puede residir en una máquina virtual o en un contenedor que se ejecuta en la misma 
+		subred que los recursos administrados. Las empresas y organizaciones con muchos hosts bajo administración 
+		tienden a operar muchos nodos de control de Ansible, distribuyendo entre grupos de infraestructura 
+		según sea necesario.
+		Archivo de inventario:/src/ansible
+		
+	
+	
+	
+	
+	
+	----------------------------------------------------------------------------------------------------------------
 	Ansible es una herramienta de automatizacion y gestion de la configuracion.
 	1. 	no necesita agentes
 	2. 	requiere que este instalado Python en los sistemas a administrar
