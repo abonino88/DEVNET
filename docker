@@ -1,0 +1,122 @@
+DOCKER
+------------------------------------------------------------------------------------------------------------------
+
+#Instalaicon de DOCKER en ubuntu
+sudo apt-get update
+#remover la version vieja
+sudo apt-get remove docker docker-engine docker.
+#instalar docker
+sudo apt install docker.io
+#iniciarlo
+sudo systemctl start docker
+sudo systemctl enable docker
+
+
+CORRO UN UBUNTU
+apt update
+apt install python3-pip
+apt install python
+
+
+dockerfile
+Es un archivo de texto simple, llamado Dockerfile. 
+Define los pasos que el comando docker build debe realizar para crear una imagen que se pueda utilizar para crear 
+el contenedor de destino.
+
+Ejemplo de dockerfile.(solo una linea)
+FROM ubuntu
+
+#Ahora podemos crear una imagen.
+#Lo que estamos haciendo aquí es crear una imagen usando un Dockerfile en el directorio actual (.) y dar un nombre,
+#o "etiqueta", de myubuntu.
+sudo docker build -t myubuntu .
+
+#Comando para ver las imagenes que tengo
+docker images
+
+#Ahora podemos iniciarla.
+#Con el siguiente comando estariamos en el Shell del contenedor
+#exit para salir del contenedor
+docker run -it myubuntu /bin/sh
+
+------------------------------------------------------------------------------------------------------------------
+EJEMPLO dockerfile
+#usaremos una imagen que ya tenga python preinstaldo.
+#A continuación, podemos decirle a Docker que cree el directorio /home/ubuntu  y copie sample-app.py 
+#en el contenedor:
+#Despues instalmos flask
+#En cuanto al inicio del servidor, queremos hacerlo cuando ejecutamos el contenedor real (en lugar de crear la 
+#imagen) por lo que usaremos un CMD.
+#Despues le indicamos que exponga el puerto 8080.Tenga en cuenta que este es el puerto en el que Flask 
+#está escuchando; Si ha configurado el servidor web para que escuche en otro lugar (como las solicitudes https 
+#en el puerto 443), este es el lugar para anotarlo.
+
+FROM python
+WORKDIR /home/ubuntu
+COPY ./sample-app.py /home/ubuntu/.
+RUN pip install flask
+CMD python /home/ubuntu/sample-app.py
+EXPOSE 8080
+
+#Contruyo la imagen
+sudo docker build -t sample-app-image .
+
+#muestro nuevamente las imagenes creadas.
+sudo docker images
+
+----------------------------
+COMANDDOS DOCKERFILE
+•	FROM
+•	MAINTAINER
+•	RUN
+•	CMD
+•	EXPOSE
+•	ENV
+•	COPY
+•	ENTRYPOINT
+•	VOLUME
+•	USER
+•	WORKDIR
+•	ARG
+•	ONBUILD
+•	STOPSIGNAL
+•	LABEL
+-----------------------------
+
+------------------------------------------------------------------------------------------------------------------
+INICIAR UN CONTENEDOR LOCALMENTE
+------------------------------------------------------------------------------------------------------------------
+#inicio el contenedor
+sudo docker run -d -P sample-app-image
+-d --detach indica que queremos ejecularlo en segundo plano
+-P le indica que se expongan los puertos por defecto (en este caso 8080)
+
+#muestra los contenedores corriendo
+sudo docker ps
+
+docker le puso como nombre jovial_sammet porque no lo especificamos.
+#Para especificar el nombre:pythontest
+sudo docker run -d -P --name pythontest sample-app-image
+
+Observe también que cuando se trata de los puertos, aunque el contenedor está escuchando en el puerto 80, eso es 
+sólo un puerto interno; Docker ha especificado un puerto externo, en este caso 32774, que reenviará a ese 
+puerto interno. Esto nos permite ejecutar varios contenedores que escuchan en el mismo puerto sin tener 
+conflictos. Por lo tanto, si queríamos extraer nuestro sitio web de aplicación de ejemplo, podemos usar 
+la dirección IP pública para el servidor host y ese puerto. 
+
+localhost:32774    -> el que le asigno docker.
+
+Docker también nos permite especificar un puerto determinado para reenviar.
+sudo docker run -d -p 8080:80 --name pythontest sample-app-image
+
+Una vez que el contenedor se está ejecutando, puede iniciar sesión en él del igual que iniciar sesión 
+en cualquier host físico o virtual mediante el comando exec  del host en el que se ejecuta el contenedor:
+
+sudo docker exec -it pythontest /bin/sh
+
+#detener el contenedor
+sudo docker stop pythontest
+#removerlo
+sudo docker rmi pythontest
+
+
