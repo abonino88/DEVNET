@@ -121,5 +121,31 @@ sudo docker rmi pythontest
 #forzar el borrado
 sudo docker rmi -f imageName
 
+EJEMPLO DE APLICACION
+------------------------------------------------------------------------------------------------------------------
+#sample-app.py
+from flask import Flask
+from flask import request
+sample = Flask(__name__)
+@sample.route("/")
+def main():
+    return "You are calling me from "+ request.remote_addr
+if __name__ == "__main__":
+    sample.run(host="0.0.0.0", port=8080)
+
+
+#Instalo python
+sudo apt update
+sudo apt -y install python python-pip
+#Instalo Flask
+sudo pip install flask
+#abro el firewall
+sudo ufw allow 8080
+Rules updated
+Rules updated (v6)
+
+
+
+
 
 
