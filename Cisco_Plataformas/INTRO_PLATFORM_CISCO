@@ -1,0 +1,64 @@
+INTRODUCTION TO CISCO PLATFORMS
+---------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+SEGURIDAD
+---------------------------------------------------------------------------------------------------------------------
+Cisco proporciona una amplia cartera de tecnologías de seguridad y familias de productos que son 
+configurables y manejables a través de API. Esta sección se centrará en:
+
+•	Advanced Malware Protection (AMP) for Endpoints
+		proporciona acceso API para automatizar los flujos de trabajo de seguridad e incluye capacidades 
+		avanzadas de espacio aislado para inspeccionar cualquier archivo que parezca malware de una manera
+		segura y aislada. AMP funciona con dispositivos Windows, Mac, Linux, Android e iOS a través de 
+		implementaciones de nube pública o privada.
+		Con la información proporcionada por la API de AMP, puede detectar, contener y eliminar malware avanzado.
+		Se integra con Umbrella y Meraki (algunso otros)
+		Con la API de AMP, puede buscar equipos o dispositivos que tengan asociaciones con un evento o actividad 
+		determinado mediante parámetros de consulta. Por ejemplo, si conoce malware con una dirección URL o un 
+		archivo .exe  determinado, puede ver qué equipos han entrado en contacto con él.
+		
+•	Cisco Firepower Management Center (FMC)
+		consola de administración central para el Firewall para los FTD
+		opciones de administración:
+			•	FirePOWER Device Manager(FDM)/FTD-API/CDO – Estas tres opciones pueden coexistir.
+			•	FirePOWER Management Center (FMC) – Para escenarios avanzados, FMC proporciona la mayor funcionalidad 
+				del producto a través de su interfaz gráfica de usuario. Las capacidades de API entre los dos 
+				son similares.
+
+•	Cisco Firepower Threat Defense (FTD)
+		Otra opción de administración es configurar directamente el dispositivo Firepower Threat Defense a través 
+		de su API REST en el dispositivo, que proporciona capacidades de API similares a la API de FMC. La API 
+		de FMC y las API de FTD no pueden coexistir directamente.
+		
+•	Cisco Identity Services Engine (ISE)
+		El ISE proporciona un motor basado en reglas para habilitar el acceso de red basado en políticas a los 
+		usuarios y a los dispositivos. 
+		La arquitectura ISE de Cisco consiste en nodos.Un nodo es un dispositivo físico o virtual individual de 
+		Cisco ISE que cumple alguno de estas funciones:
+			Administration:	En este nodo usted realiza todas las operaciones administrativas en Cisco ISE. 
+							Controla todas las configuraciones relacionadas con el sistema, como la autenticación,
+							la autorización y la contabilidad.
+			Policy Service:	proporciona el acceso a la red, la postura, el acceso del invitado, el 
+							aprovisionamiento del cliente, y los servicios degeneración de perfiles
+			Monitoring:	Almacena los mensajes de registro de todos los nodos de Administración y Servicio de 
+						directivas de una red.
+			pxGrid:	permite al sistema intercambiar datos depolítica y configuración entre nodos. 
+		
+•	Cisco Threat Grid
+		plataforma de análisis de malware
+		
+•	Cisco Umbrella
+		utiliza servidores de nombres de dominio (DNS) para aplicar la seguridad en la red. Configurar el DNS 
+		para dirigir el tráfico a Umbrella y Umbrella aplica la configuración de seguridad en su lista global 
+		de nombres de dominio en función de las directivas de su organización.
+		Umbrella bloquea el acceso a dominios malintencionados, direcciones URL, direcciones IP y archivos. 
+		Los datos de inteligencia de amenazas de paraguas incluyen una fuente de Cisco Talos. Cisco Talos es 
+		un equipo de investigadores, analistas e ingenieros, que crean datos de amenazas precisos y procesables 
+		y los mantienen actualizado para que los productos de Cisco los utilicen. 
+		
+
+
