@@ -4,3 +4,46 @@ IOS significa "Sistema Operativo de Internetwork." IOS era el sistema operativo 
 para los routeres Cisco Systems y los switches de red cisco. IOS XE es la plataforma 
 programable de próxima generación.
 
+IOS XE se basa en Linux. Las funciones de red clave se ejecutan como demonios del sistema 
+y procesos del sistema, lo que se traduce en una mayor estabilidad. 
+
+En IOS XE se separan el plano de control y el plano de datos. El plano de control "controla" 
+la red, lo que significa que almacena las rutas, la asignación, generalmente todas las 
+"señales" que se necesitan para ejecutar el router o el Switch. 
+El plano de datos contiene los datos reales de cliente, usuario o aplicación que deben 
+recorrer la red de un dispositivo a otro.
+
+Los modelos YANG del dispositivo Cisco se pueden obtener del repositorio de modelos YANG 
+del dispositivo de Cisco.  
+
+NETCONF/YANG se soporta a partir del software IOS XE 16.3.1. En el Cisco IOS XE Fuji 16.8.1 
+y versiones posteriores.
+
+Habilitacion de la programacion basada el modelos en los terminales:
+
+#IOS XE
+configure terminal
+Las conexiones NETCONF se deben autenticar mediante credenciales AAA. Típicamente el RADIUS, 
+el TACACS+, o los usuarios locales definidos con el acceso del nivel de privilegio 15 se permiten,
+pero que se ejecuta de un modo de privilegio determinado varía dependiendo de la plataforma.
+
+netconf-yang
+
+Las conexiones RESTCONF se deben autenticar mediante credenciales AAA. Se permite el RADIUS, 
+el TACACS+, o los usuarios locales definidos con el acceso del nivel de privilegio 15.
+RESTCONF se ejecuta a través de HTTPS. Los siguientes comandos deben estar habilitados para 
+admitir RESTCONF a través del puerto 443:
+
+ip http secure-server
+restconf
+
+Cisco DNA (Digital Network Architecture) Center
+------------------------------------------------
+Un centro de ADN de Cisco es un controlador fundamental y una plataforma de análisis en el corazón 
+de una red basada en la intención de Cisco para las organizaciones grandes y medianas. 
+Proporciona un panel único para la administración de redes, la automatización de la red, la 
+garantía de la red, la supervisión, el análisis y la seguridad.
+Cisco DNA Center proporciona un panel GUI basado en web y la RESTful Intent API  utilizada 
+para acceder mediante programación sus servicios y funciones.
+
+
