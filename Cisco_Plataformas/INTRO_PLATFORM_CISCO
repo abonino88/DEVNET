@@ -1,8 +1,227 @@
 INTRODUCTION TO CISCO PLATFORMS
 ---------------------------------------------------------------------------------------------------------------------
 
+WEBEX TEAMS
+---------------------------------------------------------------------------------------------------------------------
+Webex Teams incluye soluciones precompiladas con aplicaciones de terceros de proveedores como Microsoft, Google Cloud 
+y Salesforce. Con las integraciones de Microsoft Office 365, Microsoft Exchange y Google Calendar, puede ver su lista 
+de reuniones en Webex Teams.
+•	Capaz de programar reuniones.
+•	Los usuarios pueden compartir y editar archivos desde Microsoft OneDrive y SharePoint Online directamente en 
+	espacios de Webex Teams.
+Se pueden configurar otras integraciones mediante Webex App Hub para conectar equipos de Webex con el trabajo que 
+se realiza en otras herramientas como Service Now, Trello, Asana, Salesforce y JIRA.
+
+API de Webex Teams
+------------------
+Las API de Webex Teams son RESTful. 
+Actualmente, la API solo admite la devolución de datos en formato application/json.  
+Por ejemplo, si desea obtener una lista de todas las habitaciones (espacios) de las que es miembro, haría una 
+solicitud GET a /memberships.
+
+#CONSULTA API
+import requests
+import json
+# This access token may be a (limited duration) personal access token, a Bot token, or an OAuth token from an 
+# Integration or Guest Issuer application.
+# IMPORTANT
+# Make sure to replace access_token with YOUR access token.
+access_token = 'PONER ACA MI TOKEN'
+url = 'https://api.ciscospark.com/v1/people/me'
+headers = {
+    'Authorization': 'Bearer {}'.format(access_token)
+}
+res = requests.get(url, headers=headers)
+#indent=4 indica qeu use 4 espacios para la sangria.
+print(json.dumps(res.json(), indent=4))
+#FIN CONSULTA API
+
+#PAGINATION
+#por defecto devuelve 100 registros como maximo
+import requests
+import json
+access_token = '' # Make sure to add your access token here!
+url = 'https://api.ciscospark.com/v1/memberships'
+headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'Content-Type': 'application/json'
+}
+params = {
+    "max": 1
+}
+res = requests.get(url, headers=headers, params=params)
+formatted_message = """
+Webex Teams API Response
+----------------------------------
+Response Status Code   : {}
+Response Link Header   : {}
+Response Body          : {}
+-----------------------------------
+""".format(res.status_code,  res.headers.get('Link'), json.dumps(res.json(), indent=4))
+print(formatted_message)
+#en el encabezado de respuesta LINK -> contiene datos de como recuperar datos adicionales
+#FIN PAGINATION
+
+#PAGINACION NEXT DATOS
+# Make the next paginated API request
+import requests
+import json
+access_token = ''  # Make sure to add your access token here
+url = 'https://api.ciscospark.com/v1/memberships'
+headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'Content-Type': 'application/json'
+}
+params = {
+    "max": 1
+}
+res = requests.get(url, headers=headers, params=params)
+second_response = requests.get(res.links['next']['url'], headers=headers)
+formatted_message = """
+Webex Teams Second API Response
+----------------------------------
+Response Status Code   : {}
+Response Link Header   : {}
+Response Body          : {}
+-----------------------------------
+""".format(second_response.status_code,  second_response.headers.get('Link'), json.dumps(second_response.json(), indent=4))
+print(formatted_message)
+#FIN PAGINACION NEXT DATOS
 
 
+
+
+
+https://developer.webex.com
+Documentation -> REST API -> Getting Started  (de aa saco del TOKEN) (No usar en produccion)
+
+•	Utilice la API de Webex para crear webhooks que permitan una comunicación detallada y un control de aplicaciones 
+	y servicios en respuesta a eventos específicos en los equipos de Webex.
+•	Cree bots que emulen a los usuarios de Webex y median con aplicaciones externas para proporcionar servicios 
+	(a menudo mediante webhooks).
+•	Utilice webex Embedding APIs para Java, node.js, navegadores, iOS y Android, junto con Webex Widgets, para 
+	incrustar la funcionalidad de mensajería/llamadas de voz/vídeo de Webex en aplicaciones de escritorio, web 
+	y móviles.
+	
+#Listar personas de su organizacion
+import requests
+access_token = ''  # Make sure to add your access token here
+url = 'https://api.ciscospark.com/v1/people'
+headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'Content-Type': 'application/json'
+}
+params = {
+    'email': '' # Make sure you add your users's email address here
+}
+res = requests.get(url, headers=headers, params=params)
+print(res.json())
+
+#DATOS DE UNA PERSONA EN PARTICULAR
+person_id = '' # Add your ID here, which you get from the prior request
+url = 'https://api.ciscospark.com/v1/people/{}'.format(person_id)
+headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'Content-Type': 'application/json'
+}
+res = requests.get(url, headers=headers)
+print(res.json())
+
+
+#LISTADO DE ROOMS
+import requests
+
+access_token = ''  # Make sure to add your access token here
+url = 'https://api.ciscospark.com/v1/rooms'
+headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'Content-Type': 'application/json'
+}
+params={'max': '100'}
+res = requests.get(url, headers=headers, params=params)
+print(res.json())
+
+#CREACION DE UN ROOM
+import requests
+
+access_token = ''  # Make sure to add your access token here
+url = 'https://api.ciscospark.com/v1/rooms'
+headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'Content-Type': 'application/json'
+}
+params={'title': 'DevNet Associate Training!'}
+res = requests.post(url, headers=headers, json=params)
+print(res.json())
+
+#OBTENER DETALLES DE LA REUNION
+room_id = '' # Make sure you add the room ID value that was returned from the previous call you made
+url = 'https://api.ciscospark.com/v1/rooms/{}/meetingInfo'.format(room_id)
+headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'Content-Type': 'application/json'
+}
+res = requests.get(url, headers=headers)
+print(res.json())
+
+#VER PERTENENCIAS
+import requests
+
+access_token = ''  # Make sure to add your access token here
+room_id = ''
+url = 'https://api.ciscospark.com/v1/memberships'
+headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'Content-Type': 'application/json'
+}
+params = {'roomId': room_id}
+res = requests.get(url, headers=headers, params=params)
+print(res.json())
+
+#AGREGAR A ALGUIEN A UNA SALA
+import requests
+
+access_token = ''  # Make sure to add your access token here
+room_id = '' # Add the room Id from the previous example
+person_email = '' # Add the email address of someone with a Webex Teams account
+url = 'https://api.ciscospark.com/v1/memberships'
+headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'Content-Type': 'application/json'
+}
+params = {'roomId': room_id, 'personEmail': person_email}
+res = requests.post(url, headers=headers, json=params)
+print(res.json())
+
+#ENVIAR MENSAJES A UNA SALA en NEGRITA (MARKDOWN)
+import requests
+
+access_token = ''  # Make sure to add your access token here
+room_id = '' # Add the roomId here
+message = 'Hello **Devvie**' # This is your Markdown message
+url = 'https://api.ciscospark.com/v1/messages'
+headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'Content-Type': 'application/json'
+}
+params = {'roomId': room_id, 'markdown': message}
+res = requests.post(url, headers=headers, json=params)
+print(res.json())
+
+
+
+
+WEBEX Devices
+---------------------------------------------------------------------------------------------------------------------
+Los dispositivos Webex se pueden personalizar a través de la API, conocida como xAPI. Esto permite la comunicación 
+bidireccional con aplicaciones y sistemas de control de terceros.
+Hay varias maneras de acceder a xAPI: conexión serial Telnet/SSH, HTTP y RS-232. 
+Independientemente del método que elija, xAPI tiene el mismo formato general.
+xAPI admite XML y JSON y proporciona acceso directo a través de la línea de comandos. 
+También es compatible con macros de JavaScript para la personalización en el dispositivo.
+
+Al hablar sobre los dispositivos Webex, Cisco está actualmente haciendo la transición hacia el uso del término 
+generalizado "Extensiones de iU"(Customizacion de pantallas) (Touch 10 / DX)
 
 
 SEGURIDAD
